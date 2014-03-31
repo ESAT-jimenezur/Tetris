@@ -27,16 +27,14 @@ void setColors(int texto, int fondo){
 
 void menu(){
 
-    printf("*** ------------ *** iJosTris Admin Backend *** ------------ ***\n");
+    printf("*** ------------ *** iJosTris Admin Backend *** ------------ ***\n\n\n");
 
 }
 
 int main(){
-    /* Para la correcta ejecución de este juego, debemos poner la consola en "Lucida Console" y 8 píxeles de tamaño */
-
-
+    /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
     //Nuestra ventana molona bien grande
-    ventanaConsola(155,73, "iJoStratego");
+    ventanaConsola(150, 100, "iJoStratego");
 
     //Establecemos los colores iniciales
     setColors(0, 14);
