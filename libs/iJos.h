@@ -170,7 +170,7 @@ for(i=1;i<alto;i++)
 
 }
 
-void parrilla(int x, int y, int filas, int columnas, int ancho, int alto, int espacioF, int espacioC){
+void parrilla(float x, float y, float filas, float columnas, float ancho, float alto, float espacioF, float espacioC){
     int i,j;
 
     for(i=0; i < filas; i++){
