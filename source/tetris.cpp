@@ -105,6 +105,7 @@ void pantallaJuego(){
     //insertFicha(0, 0);
     drawGameInterface(gameInterface_position_X, gameInterface_position_Y, ficha_size);
     //YEAH --> drawFicha(0, 0, 1);
+    drawFicha(10,10,1);
 
     // Tiempo Inicial
     struct tm *HoraFechaActual;
@@ -147,20 +148,23 @@ void pantallaJuego(){
 
         /* TO-DO*/
         if(kbhit()){
+            fflush(stdin);
             tecla=getch();
+
             clearBlock(posFicha_X, posFicha_Y, ficha_size);
+            //printf("%d %d", posFicha_X, posFicha_Y);
             if(tecla == 80){ // Abajo
-                drawFicha(posFicha_X, posFicha_Y, 1);
                 posFicha_Y++;
+                drawFicha(posFicha_X, posFicha_Y, 1);
             }else if(tecla == 72){ // Arriba
-                drawFicha(posFicha_X, posFicha_Y, 1);
                 posFicha_Y--;
+                drawFicha(posFicha_X, posFicha_Y, 1);
             }else if(tecla == 75){ // Izquierda
-                drawFicha(posFicha_X, posFicha_Y, 1);
                 posFicha_X--;
-            }else if(tecla == 77){ // Derecha
                 drawFicha(posFicha_X, posFicha_Y, 1);
+            }else if(tecla == 77){ // Derecha
                 posFicha_X++;
+                drawFicha(posFicha_X, posFicha_Y, 1);
             }
 
         }
@@ -227,20 +231,17 @@ void insertFicha(int game_zone_table_X, int game_zone_table_Y){
 */
 
 void clearBlock(int posX, int posY, int size){
-    //cursorPos(gameInterface_position_X + gameInterface_size_margin, gameInterface_position_Y + gameInterface_size_margin + (lineY-1);
-    //for(int j = 0; j < (gameInterface_size_width + gameInterface_size_margin) * size/2 ; j++){
-        //printf(" ");
-    //}
+
     int localX = posX + gameInterface_position_X + gameInterface_size_margin;
     int localY = posY + gameInterface_position_Y + gameInterface_size_margin;
 
-    cursorPos(localX, localY); // Esto ajusta el borrado de la linea anterior
-
-    for(int i = 0; i < 7; i++){
-        for(int j = 0; j < 5; j++){
-            printf("3");
+    cursorPos(localX, localY);
+    //printf("%d %d", posX, posY);
+    for(int i = posY-1; i < posY+7; i++){
+        for(int j = posX-1; j < posX+5; j++){
+            printf(" ");
         }
-        //printf("\n");
+        printf("\n");
         localY++;
         cursorPos(localX, localY);
     }
