@@ -44,7 +44,7 @@ void drawGameInterface(int posX, int posY, int size);
 void insertFicha(int game_zone_table_X, int game_zone_table_Y);
 void drawFicha(int posX, int posY, int tipoFicha);
 void clearBlock(int posX, int opsY, int size);
-void drawMargins();
+
 
 
 void loader_game_zone_table(){
@@ -105,8 +105,8 @@ void pantallaJuego(){
 
     //convierteTextoAASCII(anchoVentana/2 - (strlen(titulo)/2), 2, titulo);
 
-    //insertFicha(0, 0);
     drawGameInterface(gameInterface_position_X, gameInterface_position_Y, ficha_size);
+
     //YEAH --> drawFicha(0, 0, 1);
     drawFicha(10,10,1);
 
@@ -193,27 +193,10 @@ void drawGameInterface(int posX, int posY, int size = 1){
     for(int i = 0; i < (gameInterface_size_height + gameInterface_size_margin) * size; i++){
 
         int controller_height = 0;
+        //Vaciamos el tablero
         for(int j = 0; j < (gameInterface_size_width + gameInterface_size_margin) * size; j++){
-
-            /*if(i == 0 || i == 21 || j == 0 || j == 11){
-                //setColors(0, 12);
-            }else{
-                //setColors(0, 14);
-            }*/
             setColors(0, 14);
-            /*
-
-            if(game_zone_table[controller_width][controller_height] == 1){
-                setColors(0, 9);
-            }else{
-                setColors(0, 14);
-            }
-
-            printf("%d", game_zone_table[controller_width][controller_height]);
-            controller_height++;
-            */
             printf(" ");
-
         }
 
         printf("\n");
