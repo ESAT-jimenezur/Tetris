@@ -13,8 +13,8 @@
 const int anchoVentana      = 150;
 const int altoVentana       = 100;
 
-const int gameInterface_size_width    = 20;
-const int gameInterface_size_height   = 10;
+const int gameInterface_size_height   = 20;
+const int gameInterface_size_width    = 10;
 const int gameInterface_size_margin   = 2;
 const int gameInterface_position_X    = 10;
 const int gameInterface_position_Y    = 10;
@@ -25,7 +25,7 @@ const int ficha_size                  = 4;
 int currentFicha_X                    = 0;
 int currentFicha_Y                    = 0;
 
-int game_zone_table[gameInterface_size_width][gameInterface_size_height];
+int game_zone_table[gameInterface_size_height][gameInterface_size_width];
 
 
 
@@ -44,14 +44,17 @@ void drawGameInterface(int posX, int posY, int size);
 void insertFicha(int game_zone_table_X, int game_zone_table_Y);
 void drawFicha(int posX, int posY, int tipoFicha);
 void clearBlock(int posX, int opsY, int size);
+void drawMargins();
+
 
 void loader_game_zone_table(){
-    for(int i = 0; i < gameInterface_size_width; i++){
-        for(int j = 0; j < gameInterface_size_height; j++){
+    for(int i = 0; i < gameInterface_size_height; i++){
+        for(int j = 0; j < gameInterface_size_width; j++){
             game_zone_table[i][j] = 0;
         }
     }
 }
+
 
 
 void convierteTextoAASCII(int posX, int posY, char* titulo){
@@ -130,18 +133,25 @@ void pantallaJuego(){
         struct tm *HoraSiguiente = localtime(&tiempo);
 
         //Esta es la estructura
-        //hh=HoraFechaActual->tm_hour;
-        //mm=HoraFechaActual->tm_min;
-        //ss=HoraFechaActual->tm_sec;
+        int hh=HoraFechaActual->tm_hour;
+        int mm=HoraFechaActual->tm_min;
+        int ss=HoraFechaActual->tm_sec;
 
 
         /*  Auto movimiento
         int t_diff = 0;
         if((HoraSiguiente->tm_sec - ss_ini) + t_diff == 1){
-            drawFicha(0, drawPos_y, 1);
-            drawPos_y ++;
-            clearLine(0, ficha_size);
+            // Gravedad
+            clearBlock(posFicha_X, posFicha_Y, ficha_size);
+            posFicha_Y++;
+
+
+
+            drawFicha(posFicha_X, posFicha_Y, 1);
             t_diff++;
+
+            cursorPos(10,10);
+            printf("%d %d", HoraSiguiente->tm_sec - ss_ini, ss_ini);
         }
         */
 
@@ -150,12 +160,15 @@ void pantallaJuego(){
         if(kbhit()){
             fflush(stdin);
             tecla=getch();
+            printf("%d %d", posFicha_Y+1, (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size);
 
             clearBlock(posFicha_X, posFicha_Y, ficha_size);
-            //printf("%d %d", posFicha_X, posFicha_Y);
             if(tecla == 80){ // Abajo
-                posFicha_Y++;
-                drawFicha(posFicha_X, posFicha_Y, 1);
+                if(posFicha_Y + 1 != (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size){
+                    //clearBlock(posFicha_X, posFicha_Y, ficha_size);
+                    posFicha_Y++;
+                    drawFicha(posFicha_X, posFicha_Y, 1);
+                }
             }else if(tecla == 72){ // Arriba
                 posFicha_Y--;
                 drawFicha(posFicha_X, posFicha_Y, 1);
@@ -177,10 +190,10 @@ void drawGameInterface(int posX, int posY, int size = 1){
     cursorPos(posX, posY);
 
     int controller_width = 0;
-    for(int i = 0; i < (gameInterface_size_width + gameInterface_size_margin) * size; i++){
+    for(int i = 0; i < (gameInterface_size_height + gameInterface_size_margin) * size; i++){
 
         int controller_height = 0;
-        for(int j = 0; j < (gameInterface_size_height + gameInterface_size_margin) * size; j++){
+        for(int j = 0; j < (gameInterface_size_width + gameInterface_size_margin) * size; j++){
 
             /*if(i == 0 || i == 21 || j == 0 || j == 11){
                 //setColors(0, 12);
@@ -245,7 +258,6 @@ void clearBlock(int posX, int posY, int size){
         localY++;
         cursorPos(localX, localY);
     }
-
 
 }
 
