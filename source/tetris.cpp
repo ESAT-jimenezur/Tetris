@@ -125,6 +125,9 @@ void pantallaJuego(){
     int drawPos_y = 0;
     int posFicha_X = 10;
     int posFicha_Y = 10;
+
+
+
     while(true) {
 
         //Calculamos la diferencia de tiempos
@@ -143,44 +146,60 @@ void pantallaJuego(){
         if((HoraSiguiente->tm_sec - ss_ini) + t_diff == 1){
             // Gravedad
             clearBlock(posFicha_X, posFicha_Y, ficha_size);
-            posFicha_Y++;
 
-
-
-            drawFicha(posFicha_X, posFicha_Y, 1);
+            if(posFicha_Y < (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size){
+                posFicha_Y = posFicha_Y + ficha_size;
+                drawFicha(posFicha_X, posFicha_Y, 1);
+            }
             t_diff++;
 
             cursorPos(10,10);
-            printf("%d %d", HoraSiguiente->tm_sec - ss_ini, ss_ini);
-        }
-        */
 
+
+            //printf("%d %d", HoraSiguiente->tm_sec - ss_ini, ss_ini);
+        }
+
+
+        //printf("%d:%d:%d \n", hh_ini, mm_ini, ss_ini);
+        //printf("%d:%d:%d \n", hh, mm, ss);
+        //printf("Diff: ");
+        */
 
         /* TO-DO*/
         if(kbhit()){
             fflush(stdin);
             tecla=getch();
-            printf("%d %d", posFicha_Y+1, (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size);
 
-            clearBlock(posFicha_X, posFicha_Y, ficha_size);
+            //printf("%d %d", posFicha_X, (gameInterface_size_width - gameInterface_size_margin/2)*ficha_size);
+
+            //clearBlock(posFicha_X, posFicha_Y, ficha_size);
             if(tecla == 80){ // Abajo
-                if(posFicha_Y + 1 != (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size){
-                    //clearBlock(posFicha_X, posFicha_Y, ficha_size);
-                    posFicha_Y++;
+                if(posFicha_Y < (gameInterface_size_height-1 - gameInterface_size_margin/2)*ficha_size){
+                    clearBlock(posFicha_X, posFicha_Y, ficha_size);
+                    posFicha_Y = posFicha_Y + ficha_size;
                     drawFicha(posFicha_X, posFicha_Y, 1);
                 }
             }else if(tecla == 72){ // Arriba
-                posFicha_Y--;
+                posFicha_Y - posFicha_Y - ficha_size;
                 drawFicha(posFicha_X, posFicha_Y, 1);
             }else if(tecla == 75){ // Izquierda
-                posFicha_X--;
-                drawFicha(posFicha_X, posFicha_Y, 1);
+                if(posFicha_X > gameInterface_size_margin){
+                    clearBlock(posFicha_X, posFicha_Y, ficha_size);
+                    posFicha_X = posFicha_X - ficha_size;
+                    drawFicha(posFicha_X, posFicha_Y, 1);
+                }
             }else if(tecla == 77){ // Derecha
-                posFicha_X++;
-                drawFicha(posFicha_X, posFicha_Y, 1);
+                if(posFicha_X < (gameInterface_size_width * ficha_size) - gameInterface_size_margin){
+                    clearBlock(posFicha_X, posFicha_Y, ficha_size);
+                    posFicha_X = posFicha_X + ficha_size;
+                    drawFicha(posFicha_X, posFicha_Y, 1);
+                }
             }
-
         }
+
+
+
+
 
     }
 }
