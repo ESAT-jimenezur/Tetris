@@ -55,8 +55,6 @@ void loader_game_zone_table(){
     }
 }
 
-
-
 void convierteTextoAASCII(int posX, int posY, char* titulo){
 
     cursorPos(posX, posY);
@@ -108,7 +106,15 @@ void pantallaJuego(){
     drawGameInterface(gameInterface_position_X, gameInterface_position_Y, ficha_size);
 
     //YEAH --> drawFicha(0, 0, 1);
-    drawFicha(10,10,1);
+
+    int posficha1_X = (gameInterface_size_width * ficha_size) / 2;
+
+    drawFicha(posficha1_X,0,1);
+
+    int posFicha_X = posficha1_X;
+    int posFicha_Y = 0;
+
+
 
     // Tiempo Inicial
     struct tm *HoraFechaActual;
@@ -122,13 +128,14 @@ void pantallaJuego(){
     mm_ini=HoraFechaActual->tm_min;
     ss_ini=HoraFechaActual->tm_sec;
 
-    int drawPos_y = 0;
-    int posFicha_X = 10;
-    int posFicha_Y = 10;
+
+
 
 
 
     while(true) {
+
+
 
         //Calculamos la diferencia de tiempos
         time_t tiempo=time(NULL);
@@ -174,7 +181,7 @@ void pantallaJuego(){
 
             //clearBlock(posFicha_X, posFicha_Y, ficha_size);
             if(tecla == 80){ // Abajo
-                if(posFicha_Y < (gameInterface_size_height-1 - gameInterface_size_margin/2)*ficha_size){
+                if(posFicha_Y < (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size){
                     clearBlock(posFicha_X, posFicha_Y, ficha_size);
                     posFicha_Y = posFicha_Y + ficha_size;
                     drawFicha(posFicha_X, posFicha_Y, 1);
@@ -189,7 +196,7 @@ void pantallaJuego(){
                     drawFicha(posFicha_X, posFicha_Y, 1);
                 }
             }else if(tecla == 77){ // Derecha
-                if(posFicha_X < (gameInterface_size_width * ficha_size) - gameInterface_size_margin){
+                if(posFicha_X < (gameInterface_size_width * ficha_size) - gameInterface_size_margin ){
                     clearBlock(posFicha_X, posFicha_Y, ficha_size);
                     posFicha_X = posFicha_X + ficha_size;
                     drawFicha(posFicha_X, posFicha_Y, 1);
@@ -287,12 +294,17 @@ void drawFicha(int posX, int posY, int tipoFicha){
             }
             // END L
         break;
+        case 2:
+
+        break;
 
     }
 
 
 
 }
+
+
 
 void setColors(int texto, int fondo){
     colorTexto(texto, fondo);
