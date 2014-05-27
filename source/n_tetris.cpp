@@ -16,6 +16,8 @@ const int gameInterface_margin        = 2;
 const int starting_point_x            = 5;
 const int starting_point_y            = 5;
 
+const int gameFicha_ascii_model       = 178;
+
 
 int game_area[23][12] = {
     9,8,8,8,8,8,8,8,8,8,8,9,
@@ -45,51 +47,65 @@ int game_area[23][12] = {
 
 
 /* Method declarations */
+void game_init();
 void setColors(int texto, int fondo);
 void resetColors();
-void drawMargins();
 void drawGameArea();
+void insertFicha(int posX, int posY, int tipoFicha);
+void gameLoop();
+int getFicha();
 
-void drawMargins(){
-    bool rellenar = 0;
-    int step = 0;
+void game_init(){
+    seed();
+    /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
+    //Nuestra ventana molona bien grande
+    ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
+    //Establecemos los colores iniciales
+    system("color F8");
+    //Dibujamos los margenes
+    //drawMargins();
+}
 
-    //Top side
-    cursorPos(starting_point_x, starting_point_y);
-    for(int i = 0; i < gameInterface_size_width; i++){
-            printf("9");
-    }
-    //Left side
-    for(int i = 0; i < gameInterface_size_height; i++){
-        cursorPos(starting_point_x, starting_point_y + step);
-        printf("9\n");
-        step++;
-    }
-    //Right side
-    step = 0;
-    for(int i = 0; i <= gameInterface_size_height; i++){
-        cursorPos(starting_point_x + gameInterface_size_width, starting_point_y + step);
-        printf("9\n");
-        step++;
-    }
-    //Bottom side
-    cursorPos(starting_point_x, starting_point_y + gameInterface_size_height);
-    for(int i = 0; i < gameInterface_size_width; i++){
-        printf("9");
-    }
+int getFicha(){
+   return aleatorio(6);
+}
 
-    //Si esta a 1, rellenamos el area de juego con espacios vacios
-    if(rellenar){
-        step = 0;
-        for(int j = 0; j < (gameInterface_size_height - 5); j++){
-            cursorPos(starting_point_x + 1, starting_point_y + 1 + step);
-            for(int i = 0; i < gameInterface_size_width - 1; i++){
-                printf(" ");
+
+void gameLoop(){
+    char tecla;
+    int posY = 2;
+    int posX = 4;
+
+    int ficha = getFicha();
+
+    insertFicha(posX, posY, 1); // ficha
+
+    while(true) {
+
+        if(kbhit()){
+            fflush(stdin);
+            tecla=getch();
+
+            //clearBlock(posFicha_X, posFicha_Y, ficha_size);
+            if(tecla == 80){ // Abajo
+                posY++;
+                insertFicha(posX, posY, 1);
+            }else if(tecla == 72){ // Arriba
+                posY--;
+                insertFicha(posX, posY, 1);
+            }else if(tecla == 75){ // Izquierda
+                posX--;
+                insertFicha(posX, posY, 1);
+            }else if(tecla == 77){ // Derecha
+                posX++;
+                insertFicha(posX, posY, 1);
             }
-           step++;
+
         }
 
+        drawGameArea();
     }
+
 
 }
 
@@ -98,18 +114,59 @@ void drawGameArea(){
    for(int j = 0; j < gameInterface_size_height + (gameInterface_margin + 1); j++){
         cursorPos(starting_point_x - gameInterface_margin, starting_point_y + step);
         for(int i = 0; i < gameInterface_size_width + gameInterface_margin; i++){
-            if(game_area[j][i] == 9){
+            if(game_area[j][i] == 9 || game_area[j][i] == 8){
                 //Margins (FC)
                 setColors(12, 15);
-            }else{
-                //Game content
+                printf("%d", game_area[j][i]);
+            }else if(game_area[j][i] == 1){ // Ficha 1
+                setColors(8, 13);
+                printf("%c", gameFicha_ascii_model);
+             }else if(game_area[j][i] == 2){ // Ficha 2
+                setColors(8, 12);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 0){ // Vacio
                 setColors(8, 15);
+                printf("0", game_area[j][i]);
             }
-            printf("%d", game_area[j][i]);
+
         }
        step++;
     }
     resetColors();
+}
+
+void insertFicha(int posX, int posY, int tipoFicha){
+    switch (tipoFicha){
+        case 1:
+            for(int i = 0; i < 4; i++){
+                for(int j = 0; j < 4; j++){
+                    if(tetrominoe_1[i][j] == 1){
+                        //printf("%c", gameFicha_ascii_model);
+                        game_area[i + posY][j + posX] = 1;
+                    }else{
+                        game_area[i + posY][j + posX] = 0;
+                    }
+                }
+
+            }
+        break;
+        case 2:
+            for(int i = 0; i < 4; i++){
+                for(int j = 0; j < 4; j++){
+                    if(tetrominoe_2[i][j] == 1){
+                        //printf("%c", gameFicha_ascii_model);
+                        game_area[i + posY][j + posX] = 2;
+                    }else{
+                        game_area[i + posY][j + posX] = 0;
+                    }
+                }
+
+            }
+        break;
+    }
+
+
+
 }
 
 void setColors(int texto, int fondo){
@@ -121,17 +178,12 @@ void resetColors(){
 }
 
 int main(){
-    /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
-    //Nuestra ventana molona bien grande
-    ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
 
-    //Establecemos los colores iniciales
-    system("color F8");
-    //Dibujamos los margenes
-    //drawMargins();
+    game_init();
+
     drawGameArea();
 
-
+    gameLoop();
 
     return 0;
 }
