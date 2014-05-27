@@ -77,7 +77,7 @@ void gameLoop(){
     int posY = starting_point_y;
     int posX = starting_point_x;
 
-    int ficha = 2;//getFicha();
+    int ficha = 3;//getFicha();
 
     insertFicha(posX, posY, ficha); // ficha
 
@@ -92,6 +92,13 @@ void gameLoop(){
             if(tecla == 80){ // Abajo
                 if(ficha == 2){
                     if(game_area[posY + 4][posX] >= 9){
+                    }else{
+                        clearFichaSide(posX, posY, 1, ficha);
+                        posY++;
+                        insertFicha(posX, posY, ficha);
+                    }
+                }else if(ficha == 3){
+                    if(game_area[posY + 2][posX] >= 9){
                     }else{
                         clearFichaSide(posX, posY, 1, ficha);
                         posY++;
@@ -156,6 +163,13 @@ void gameLoop(){
                 ficha = getFicha();
                 insertFicha(posX, posY, ficha); // ficha
             }
+        }else if(ficha == 3){
+            if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1){ // Toca suelo, generamos una nueva ficha
+                posY = starting_point_y;
+                posX = starting_point_x;
+                ficha = getFicha();
+                insertFicha(posX, posY, ficha); // ficha
+            }
         }else{
             if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1){ // Toca suelo, generamos una nueva ficha
                 posY = starting_point_y;
@@ -182,11 +196,14 @@ void drawGameArea(){
                 //Margins (FC)
                 setColors(12, 15);
                 printf("%d", game_area[j][i]);
-            }else if(game_area[j][i] == 1){ // Ficha 1
+            }else if(game_area[j][i] == 1){ // Ficha 1 -> L
                 setColors(8, 13);
                 printf("1");
-             }else if(game_area[j][i] == 2){ // Ficha 2
+            }else if(game_area[j][i] == 2){ // Ficha 2 -> I
                 setColors(8, 12);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 3){ // Ficha 3 -> Cuadrado
+                setColors(8, 14);
                 printf("%c", gameFicha_ascii_model);
             }else if(game_area[j][i] == 0){ // Vacio
                 setColors(8, 15);
@@ -228,6 +245,21 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
                 }
             }else if(side == 3){ //Left
                 for(int i = 0; i < 4; i++){
+                    game_area[posY + i][posX] = 0;
+                }
+            }
+        break;
+        case 3:
+            if(side == 1){ // Top
+                for(int i = 0; i < 2; i++){
+                    game_area[posY][posX+i] = 0;
+                }
+            }else if(side == 2){ // Right
+                for(int i = 0; i < 2; i++){
+                    game_area[posY + i][posX + 2] = 0;
+                }
+            }else if(side == 3){ //Left
+                for(int i = 0; i < 2; i++){
                     game_area[posY + i][posX] = 0;
                 }
             }
