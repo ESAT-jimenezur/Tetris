@@ -39,7 +39,7 @@ int tetrominoe_5[4][4] ={
 };
 
 // Z
-int tetrominoe_5[4][4] ={
+int tetrominoe_6[4][4] ={
     0,0,0,0,
     0,0,0,0,
     0,1,1,0,
