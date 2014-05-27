@@ -77,9 +77,9 @@ void gameLoop(){
     int posY = starting_point_y;
     int posX = starting_point_x;
 
-    int ficha = getFicha();
+    int ficha = 2;//getFicha();
 
-    insertFicha(posX, posY, 1); // ficha
+    insertFicha(posX, posY, ficha); // ficha
 
     while(true) {
 
@@ -90,13 +90,26 @@ void gameLoop(){
             //printf("%d", game_area[posY][posX]);
             //clearBlock(posFicha_X, posFicha_Y, ficha_size);
             if(tecla == 80){ // Abajo
-                if(game_area[posY + 3][posX] >= 9){ // +4, porque 4 es el alto de la ficha
-
+                if(ficha == 2){
+                    if(game_area[posY + 4][posX] >= 9){
+                    }else{
+                        clearFichaSide(posX, posY, 1, ficha);
+                        posY++;
+                        insertFicha(posX, posY, ficha);
+                    }
                 }else{
-                    clearFichaSide(posX, posY, 1, 1);
-                    posY++;
-                    insertFicha(posX, posY, 1);
+
+                    if(game_area[posY + 3][posX] >= 9){ // +4, porque 4 es el alto de la ficha
+
+                    }else{
+                        clearFichaSide(posX, posY, 1, ficha);
+                        posY++;
+                        insertFicha(posX, posY, ficha);
+                    }
+
                 }
+
+
             }else if(tecla == 72){ // Arriba
                 //posY--;
                 //insertFicha(posX, posY, 1);
@@ -105,27 +118,54 @@ void gameLoop(){
 
                 }else{
                     posX--;
-                    insertFicha(posX, posY, 1);
-                    clearFichaSide(posX, posY, 2, 1);
+                    insertFicha(posX, posY, ficha);
+                    clearFichaSide(posX, posY, 2, ficha);
                 }
             }else if(tecla == 77){ // Derecha
-                if(game_area[posY][posX + 2] >= 9){
+                if(ficha == 2){
+                    if(game_area[posY][posX + 1] >= 9){
 
+                    }else{
+                        clearFichaSide(posX, posY, 3, ficha);
+                        posX++;
+                        insertFicha(posX, posY, ficha);
+
+                    }
                 }else{
-                    clearFichaSide(posX, posY, 3, 1);
-                    posX++;
-                    insertFicha(posX, posY, 1);
+                    if(game_area[posY][posX + 2] >= 9){
+
+                    }else{
+                        clearFichaSide(posX, posY, 3, ficha);
+                        posX++;
+                        insertFicha(posX, posY, ficha);
+
+                    }
                 }
+
+
             }
 
         }
 
         drawGameArea();
-        if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1){ // Toca suelo, generamos una nueva ficha
-            posY = starting_point_y;
-            posX = starting_point_x;
-            insertFicha(posX, posY, getFicha()); // ficha
+
+        if(ficha == 2){
+            if(game_area[posY + 4][posX] >= 9 || game_area[posY + 4][posX] == 1){ // Toca suelo, generamos una nueva ficha
+                posY = starting_point_y;
+                posX = starting_point_x;
+                ficha = getFicha();
+                insertFicha(posX, posY, ficha); // ficha
+            }
+        }else{
+            if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1){ // Toca suelo, generamos una nueva ficha
+                posY = starting_point_y;
+                posX = starting_point_x;
+                ficha = getFicha();
+                insertFicha(posX, posY, ficha); // ficha
+            }
         }
+
+
 
 
     }
@@ -177,6 +217,21 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
                 }
             }
         break;
+        case 2:
+            if(side == 1){ // Top
+                for(int i = 0; i < 1; i++){
+                    game_area[posY][posX] = 0;
+                }
+            }else if(side == 2){ // Right
+                for(int i = 0; i < 4; i++){
+                    game_area[posY + i][posX + 1] = 0;
+                }
+            }else if(side == 3){ //Left
+                for(int i = 0; i < 4; i++){
+                    game_area[posY + i][posX] = 0;
+                }
+            }
+        break;
     }
 }
 
@@ -186,7 +241,6 @@ void insertFicha(int posX, int posY, int tipoFicha){
             for(int i = 0; i < 3; i++){
                 for(int j = 0; j < 2; j++){
                     if(tetrominoe_1[i][j] == 1){
-                        //printf("%c", gameFicha_ascii_model);
                         game_area[i + posY][j + posX] = 1;
                     }else{
                         game_area[i + posY][j + posX] = 0;
@@ -197,9 +251,8 @@ void insertFicha(int posX, int posY, int tipoFicha){
         break;
         case 2:
             for(int i = 0; i < 4; i++){
-                for(int j = 0; j < 4; j++){
+                for(int j = 0; j < 1; j++){
                     if(tetrominoe_2[i][j] == 1){
-                        //printf("%c", gameFicha_ascii_model);
                         game_area[i + posY][j + posX] = 2;
                     }else{
                         game_area[i + posY][j + posX] = 0;
@@ -208,9 +261,56 @@ void insertFicha(int posX, int posY, int tipoFicha){
 
             }
         break;
+        case 3: // Por aqui
+            for(int i = 0; i < 2; i++){
+                for(int j = 0; j < 2; j++){
+                    if(tetrominoe_3[i][j] == 1){
+                        game_area[i + posY][j + posX] = 3;
+                    }else{
+                        game_area[i + posY][j + posX] = 0;
+                    }
+                }
+
+            }
+        break;
+        case 4:
+            for(int i = 0; i < 3; i++){
+                for(int j = 0; j < 2; j++){
+                    if(tetrominoe_4[i][j] == 1){
+                        game_area[i + posY][j + posX] = 4;
+                    }else{
+                        game_area[i + posY][j + posX] = 0;
+                    }
+                }
+
+            }
+        break;
+        case 5:
+            for(int i = 0; i < 2; i++){
+                for(int j = 0; j < 3; j++){
+                    if(tetrominoe_5[i][j] == 1){
+                        game_area[i + posY][j + posX] = 5;
+                    }else{
+                        game_area[i + posY][j + posX] = 0;
+                    }
+                }
+
+            }
+        break;
+        case 6:
+            for(int i = 0; i < 4; i++){
+                for(int j = 0; j < 4; j++){
+                    if(tetrominoe_6[i][j] == 1){
+                        game_area[i + posY][j + posX] = 6;
+                    }else{
+                        game_area[i + posY][j + posX] = 0;
+                    }
+                }
+
+            }
+        break;
+
     }
-
-
 
 }
 
