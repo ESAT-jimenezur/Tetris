@@ -222,6 +222,7 @@ void gameLoop(){
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
         }
 
+        /* WTF?! --> Esta parte para que servia?! ahora creo que para nada... :D
         // Checkeamos lo que hay debajo de la ficha, si toca el suelo o otra ficha, generamos una nueva
         if(ficha == 1 || ficha == 4){
             if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1){ // Toca suelo, generamos una nueva ficha
@@ -253,6 +254,7 @@ void gameLoop(){
             }
 
         }
+        */
 
         //Redibujamos el area de juego
         drawGameArea();
