@@ -14,7 +14,7 @@ const int gameInterface_size_width    = 10;
 const int gameInterface_margin        = 2;
 
 const int starting_point_x            = 5;
-const int starting_point_y            = 5;
+const int starting_point_y            = 2;
 
 const int gameFicha_ascii_model       = 178;
 
@@ -93,9 +93,12 @@ void gameLoop(){
             //printf("%d", game_area[posY][posX]);
             //clearBlock(posFicha_X, posFicha_Y, ficha_size);
             if(tecla == 80){ // Abajo
-                if(ficha == 1 ||ficha == 4){
-                    if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6){ // +4, porque 4 es el alto de la ficha
-
+                if(ficha == 1){
+                    if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6          ||         game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
+                        posY = starting_point_y;
+                        posX = starting_point_x;
+                        ficha = getFicha();
+                        insertFicha(posX, posY, ficha); // ficha
                     }else{
                         clearFichaSide(posX, posY, 1, ficha);
                         posY++;
@@ -113,7 +116,18 @@ void gameLoop(){
                         insertFicha(posX, posY, ficha);
                     }
                 }else if(ficha == 3){
-                    if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6){
+                    if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6     ||     game_area[posY + 2][posX + 1] == 1 || game_area[posY + 2][posX + 1] == 2 || game_area[posY + 2][posX + 1] == 3 || game_area[posY + 2][posX + 1] == 4 || game_area[posY + 2][posX + 1] == 5 || game_area[posY + 2][posX + 1] == 6){
+                        posY = starting_point_y;
+                        posX = starting_point_x;
+                        ficha = getFicha();
+                        insertFicha(posX, posY, ficha); // ficha
+                    }else{
+                        clearFichaSide(posX, posY, 1, ficha);
+                        posY++;
+                        insertFicha(posX, posY, ficha);
+                    }
+                }else if(ficha == 4){
+                   if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6         ||       game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
