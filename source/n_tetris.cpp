@@ -86,9 +86,8 @@ void gameLoop(){
 
     insertFicha(posX, posY, ficha); // ficha
 
-     // Makes sure the time is synchronized
-    time_t t_ultimoTick;		// Represents the last time piece dropped a level
-    time_t t_ahora;				// Represents the current time
+    time_t t_ultimoTick;		// Tiempo desde la ultima vez que una pieza bajo
+    time_t t_ahora;				// Tiempo actual
     t_ultimoTick = time(NULL);
 
     while( t_ahora - t_ultimoTick == 0 ){
@@ -224,8 +223,8 @@ void gameLoop(){
             insertFicha(posX, posY, ficha);
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
         }
-
         drawGameArea();
+
         if(ficha == 1 || ficha == 4){
             if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1){ // Toca suelo, generamos una nueva ficha
                 posY = starting_point_y;
