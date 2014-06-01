@@ -65,6 +65,8 @@ void game_init(){
     system("color F8");
     //Dibujamos los margenes
     //drawMargins();
+
+    srand( time(NULL) );
 }
 
 int getFicha(){
@@ -84,11 +86,34 @@ void gameLoop(){
 
     insertFicha(posX, posY, ficha); // ficha
 
+     // Makes sure the time is synchronized
+    time_t t_ultimoTick;		// Represents the last time piece dropped a level
+    time_t t_ahora;				// Represents the current time
+    t_ultimoTick = time(NULL);
+
+    while( t_ahora - t_ultimoTick == 0 ){
+        t_ultimoTick = time(NULL);
+        //clearFichaSide(posX, posY, 1, ficha);
+        //posY++;
+        //insertFicha(posX, posY, ficha);
+    }
+
     while(true) {
+        /** debug del tiempo
+        cursorPos(25, 20);
+        printf("Ultimo -> %d", t_ultimoTick);
+        cursorPos(25, 22);
+        printf("Ahora  -> %d", t_ahora);
+        **/
+
+
 
         if(kbhit()){
             fflush(stdin);
             tecla=getch();
+
+
+
 
             //printf("%d", game_area[posY][posX]);
             //clearBlock(posFicha_X, posFicha_Y, ficha_size);
@@ -150,7 +175,6 @@ void gameLoop(){
                     }
                 }
 
-
             }else if(tecla == 72){ // Arriba
                 //posY--;
                 //insertFicha(posX, posY, 1);
@@ -187,6 +211,18 @@ void gameLoop(){
 
             }
 
+
+
+        } // End kbhit
+
+
+        // Gravedad
+        t_ahora = time(NULL);		// Actualizamos el tiempo
+        if ( t_ahora - t_ultimoTick > 0 ){ // Checkeamos si ha pasado 1 segundo desde la ultima caida de ficha (tick)
+            clearFichaSide(posX, posY, 1, ficha);
+            posY++;
+            insertFicha(posX, posY, ficha);
+            t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
         }
 
         drawGameArea();
