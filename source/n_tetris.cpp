@@ -68,7 +68,10 @@ void game_init(){
 }
 
 int getFicha(){
-   return aleatorio(6);
+   int rand = aleatorio(5) + 1;
+   cursorPos(20, 20);
+   printf("%d", rand);
+   return rand;
 }
 
 
@@ -77,7 +80,7 @@ void gameLoop(){
     int posY = starting_point_y;
     int posX = starting_point_x;
 
-    int ficha = 5;//getFicha();
+    int ficha = getFicha();
 
     insertFicha(posX, posY, ficha); // ficha
 
@@ -120,7 +123,7 @@ void gameLoop(){
                         posY++;
                         insertFicha(posX, posY, ficha);
                     }
-                }else if(ficha == 5){
+                }else if(ficha == 5 || ficha == 6){
                     if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6){
                         posY = starting_point_y;
                         posX = starting_point_x;
@@ -138,6 +141,7 @@ void gameLoop(){
                 //posY--;
                 //insertFicha(posX, posY, 1);
             }else if(tecla == 75){ // Izquierda
+
                 if(game_area[posY][posX - 1] >= 9){
 
                 }else{
@@ -193,7 +197,7 @@ void gameLoop(){
                 ficha = getFicha();
                 insertFicha(posX, posY, ficha); // ficha
             }
-        }else if(ficha == 5){
+        }else if(ficha == 5 || ficha == 6){
             if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1){ // Toca suelo, generamos una nueva ficha
                 posY = starting_point_y;
                 posX = starting_point_x;
@@ -234,6 +238,9 @@ void drawGameArea(){
                 printf("%c", gameFicha_ascii_model);
             }else if(game_area[j][i] == 5){
                 setColors(8, 10);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 6){
+                setColors(8, 9);
                 printf("%c", gameFicha_ascii_model);
             }else if(game_area[j][i] == 0){ // Vacio
                 setColors(8, 15);
@@ -324,6 +331,21 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
                 }
             }
         break;
+        case 6:
+            if(side == 1){ // Top
+                for(int i = 0; i < 3; i++){
+                    game_area[posY][posX + i] = 0;
+                }
+            }else if(side == 2){ // Right
+                for(int i = 0; i < 3; i++){
+                    game_area[posY + i][posX + 3] = 0;
+                }
+            }else if(side == 3){ //Left
+                for(int i = 0; i < 3; i++){
+                    game_area[posY + i][posX] = 0;
+                }
+            }
+        break;
     }
 }
 
@@ -377,7 +399,7 @@ void insertFicha(int posX, int posY, int tipoFicha){
 
             }
         break;
-        case 5: // Por aqui
+        case 5:
             for(int i = 0; i < 2; i++){
                 for(int j = 0; j < 3; j++){
                     if(tetrominoe_5[i][j] == 1){
@@ -390,8 +412,8 @@ void insertFicha(int posX, int posY, int tipoFicha){
             }
         break;
         case 6:
-            for(int i = 0; i < 4; i++){
-                for(int j = 0; j < 4; j++){
+            for(int i = 0; i < 2; i++){
+                for(int j = 0; j < 3; j++){
                     if(tetrominoe_6[i][j] == 1){
                         game_area[i + posY][j + posX] = 6;
                     }else{
