@@ -18,6 +18,8 @@ const int starting_point_y            = 2;
 
 const int gameFicha_ascii_model       = 178;
 
+int puntos = 0; // Iniciamos los puntos a 0
+
 
 int game_area[23][12] = {
     9,8,8,8,8,8,8,8,8,8,8,9,
@@ -55,6 +57,7 @@ void insertFicha(int posX, int posY, int tipoFicha);
 void gameLoop();
 int getFicha();
 void clearFichaSide(int posX, int posY, int side, int tipoFicha);
+void checkLines();
 
 void game_init(){
     seed();
@@ -70,10 +73,9 @@ void game_init(){
 }
 
 int getFicha(){
-   int rand = aleatorio(5) + 1;
-   //cursorPos(20, 20);
-   //printf("%d", rand);
-   return rand;
+    int rand = aleatorio(5) + 1;
+
+    return 3;//rand;
 }
 
 
@@ -96,27 +98,18 @@ void gameLoop(){
     }
 
     while(true) {
-        /** debug del tiempo
-        cursorPos(25, 20);
-        printf("Ultimo -> %d", t_ultimoTick);
-        cursorPos(25, 22);
-        printf("Ahora  -> %d", t_ahora);
-        **/
-
-
 
         if(kbhit()){
             fflush(stdin);
             tecla=getch();
 
 
-
-
             //printf("%d", game_area[posY][posX]);
             //clearBlock(posFicha_X, posFicha_Y, ficha_size);
             if(tecla == 80){ // Abajo
+
                 if(ficha == 1){
-                    if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6          ||         game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
+                    if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6          ||         game_area[posY + 3][posX + 1] == 9 || game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -138,7 +131,7 @@ void gameLoop(){
                         insertFicha(posX, posY, ficha);
                     }
                 }else if(ficha == 3){
-                    if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6     ||     game_area[posY + 2][posX + 1] == 1 || game_area[posY + 2][posX + 1] == 2 || game_area[posY + 2][posX + 1] == 3 || game_area[posY + 2][posX + 1] == 4 || game_area[posY + 2][posX + 1] == 5 || game_area[posY + 2][posX + 1] == 6){
+                    if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6       ||       game_area[posY + 2][posX + 1] == 9 || game_area[posY + 2][posX + 1] == 1 || game_area[posY + 2][posX + 1] == 2 || game_area[posY + 2][posX + 1] == 3 || game_area[posY + 2][posX + 1] == 4 || game_area[posY + 2][posX + 1] == 5 || game_area[posY + 2][posX + 1] == 6){
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -149,7 +142,7 @@ void gameLoop(){
                         insertFicha(posX, posY, ficha);
                     }
                 }else if(ficha == 4){
-                   if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6         ||       game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
+                   if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6         ||       game_area[posY + 3][posX + 1] == 9 || game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -214,50 +207,23 @@ void gameLoop(){
 
 
         // Gravedad
+/*TODO
         t_ahora = time(NULL);		// Actualizamos el tiempo
         if ( t_ahora - t_ultimoTick > 0 ){ // Checkeamos si ha pasado 1 segundo desde la ultima caida de ficha (tick)
+
+            //Comprobar que no caiga la ficha si hay cosas debajo
             clearFichaSide(posX, posY, 1, ficha);
             posY++;
             insertFicha(posX, posY, ficha);
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
         }
+*/
 
-        /* WTF?! --> Esta parte para que servia?! ahora creo que para nada... :D
-        // Checkeamos lo que hay debajo de la ficha, si toca el suelo o otra ficha, generamos una nueva
-        if(ficha == 1 || ficha == 4){
-            if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1){ // Toca suelo, generamos una nueva ficha
-                posY = starting_point_y;
-                posX = starting_point_x;
-                ficha = getFicha();
-                insertFicha(posX, posY, ficha); // ficha
-            }
-        }else if(ficha == 2){
-            if(game_area[posY + 4][posX] >= 9 || game_area[posY + 4][posX] == 1){ // Toca suelo, generamos una nueva ficha
-                posY = starting_point_y;
-                posX = starting_point_x;
-                ficha = getFicha();
-                insertFicha(posX, posY, ficha); // ficha
-            }
-        }else if(ficha == 3){
-            if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1){ // Toca suelo, generamos una nueva ficha
-                posY = starting_point_y;
-                posX = starting_point_x;
-                ficha = getFicha();
-                insertFicha(posX, posY, ficha); // ficha
-            }
-        }else if(ficha == 5 || ficha == 6){
-            if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1){ // Toca suelo, generamos una nueva ficha
-                posY = starting_point_y;
-                posX = starting_point_x;
-                ficha = getFicha();
-                insertFicha(posX, posY, ficha); // ficha
-            }
 
-        }
-        */
 
-        //Redibujamos el area de juego
-        drawGameArea();
+        checkLines(); // --> Dentro redibujamos
+
+
 
     }
 
@@ -291,6 +257,9 @@ void drawGameArea(){
             }else if(game_area[j][i] == 6){
                 setColors(8, 9);
                 printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 99){
+                setColors(12, 14);
+                printf("%d", game_area[j][i]);
             }else if(game_area[j][i] == 0){ // Vacio
                 setColors(8, 15);
                 printf(" ", game_area[j][i]);
@@ -396,6 +365,58 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
             }
         break;
     }
+}
+
+void checkLines(){
+
+    int lineaCompleta;
+
+    int x_pos;
+	int y_pos;
+	int current_y_pos;
+	int TotalDeletedLines = 0;
+
+    // Checkeamos todas las lineas, desde abajo hacia arriba, de izquierda a derecha
+    // Si hay lineas completas, hacemos puntuacion
+    for(int y_pos = gameInterface_size_height + 1; y_pos > 1; y_pos--){
+
+        lineaCompleta = 1;
+        for(int x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
+
+            //Comprobamos si en esta linea hay algun "hueco"
+            if(game_area[y_pos][x_pos] == 0){
+                lineaCompleta = 0;
+            }
+
+        }
+
+        if(lineaCompleta){
+            cursorPos(gameInterface_size_width + 10, 30);
+            printf("Linea COMPLETA en la %d", y_pos);
+
+            // Eliminamos la linea
+            for(int x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
+                game_area[y_pos][x_pos] = 0;
+            }
+
+            // Tiramos lineas hacia abajo
+            for(current_y_pos = y_pos; current_y_pos > 2; current_y_pos--){
+
+                for(x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
+                    game_area[current_y_pos][x_pos] = game_area[current_y_pos - 1][x_pos];
+                }
+
+            }
+
+        }
+
+
+
+    }
+
+    drawGameArea();
+
+
 }
 
 void insertFicha(int posX, int posY, int tipoFicha){
