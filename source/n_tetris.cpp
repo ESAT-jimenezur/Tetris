@@ -76,6 +76,7 @@ void game_init(){
 }
 
 int getFicha(){
+    checkLines(); // --> Dentro redibujamos
     int rand = aleatorio(5) + 1;
 
     return 3;//rand;
@@ -224,8 +225,8 @@ void gameLoop(){
 
 
 
-        checkLines(); // --> Dentro redibujamos
 
+     drawGameArea();
 
 
     }
@@ -434,7 +435,7 @@ void checkLines(){
 
 
 
-    drawGameArea();
+
 
 }
 
