@@ -18,8 +18,10 @@ const int starting_point_y            = 2;
 
 const int gameFicha_ascii_model       = 178;
 
-int puntos = 0; // Iniciamos los puntos a 0
-
+// Puntos
+int PUNTOS = 0; // Iniciamos los puntos a 0
+int PUNTOS_LINEA = 10;
+int PUNTOS_TETRIS = 100;
 
 int game_area[23][12] = {
     9,8,8,8,8,8,8,8,8,8,8,9,
@@ -58,6 +60,7 @@ void gameLoop();
 int getFicha();
 void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void checkLines();
+void updatePoints();
 
 void game_init(){
     seed();
@@ -65,7 +68,7 @@ void game_init(){
     //Nuestra ventana molona bien grande
     ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
     //Establecemos los colores iniciales
-    system("color F8");
+    system("color 08");
     //Dibujamos los margenes
     //drawMargins();
 
@@ -237,8 +240,8 @@ void drawGameArea(){
         for(int i = 0; i < gameInterface_size_width + gameInterface_margin; i++){
             if(game_area[j][i] == 9 || game_area[j][i] == 8){
                 //Margins (FC)
-                setColors(12, 15);
-                printf("%d", game_area[j][i]);
+                setColors(3, 15);
+                printf(" ", game_area[j][i]);
             }else if(game_area[j][i] == 1){ // Ficha 1 -> L
                 setColors(8, 13);
                 printf("%c", gameFicha_ascii_model);
@@ -261,7 +264,7 @@ void drawGameArea(){
                 setColors(12, 14);
                 printf("%d", game_area[j][i]);
             }else if(game_area[j][i] == 0){ // Vacio
-                setColors(8, 15);
+                setColors(1, 15);
                 printf(" ", game_area[j][i]);
             }
 
@@ -374,7 +377,8 @@ void checkLines(){
     int x_pos;
 	int y_pos;
 	int current_y_pos;
-	int TotalDeletedLines = 0;
+	int lineasEliminadas = 0;
+	int must_update_points = 0;
 
     // Checkeamos todas las lineas, desde abajo hacia arriba, de izquierda a derecha
     // Si hay lineas completas, hacemos puntuacion
@@ -391,8 +395,6 @@ void checkLines(){
         }
 
         if(lineaCompleta){
-            cursorPos(gameInterface_size_width + 10, 30);
-            printf("Linea COMPLETA en la %d", y_pos);
 
             // Eliminamos la linea
             for(int x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
@@ -408,15 +410,52 @@ void checkLines(){
 
             }
 
-        }
+            must_update_points = 1;
+            lineasEliminadas += 1;
+            y_pos++;
+
+        } // Linea completa
 
 
+    }// Check lines bucle
 
+    // Actualizamos los puntos
+    if(lineasEliminadas < 4){
+        PUNTOS += lineasEliminadas * PUNTOS_LINEA;
+
+    }else{
+        PUNTOS += PUNTOS_TETRIS;
     }
+
+    if(must_update_points){
+        updatePoints();
+        must_update_points = 0;
+    }
+
+
 
     drawGameArea();
 
+}
 
+void updatePoints(){
+
+    //cursorPos(gameInterface_size_width + 10,  2);
+    //printf(" - - - SCORE - - -");
+    //cursorPos(gameInterface_size_width + 10, 4);
+    //printf("%d", PUNTOS);
+
+    for(int y = 2; y < 8; y++){
+        for(int x = 10; x <= 20; x++){
+            cursorPos(gameInterface_size_width + x, y);
+            printf(" ");
+        }
+    }
+    cursorPos(gameInterface_size_width + 10, 2);
+    printf("---SCORE---");
+
+    cursorPos(gameInterface_size_width + 15, 3);
+    printf("%d", PUNTOS);
 }
 
 void insertFicha(int posX, int posY, int tipoFicha){
@@ -503,7 +542,7 @@ void setColors(int texto, int fondo){
 }
 
 void resetColors(){
-    setColors(8, 15);
+    setColors(1, 15);
 }
 
 int main(){
@@ -511,6 +550,8 @@ int main(){
     game_init();
 
     drawGameArea();
+
+    updatePoints();
 
     gameLoop();
 
