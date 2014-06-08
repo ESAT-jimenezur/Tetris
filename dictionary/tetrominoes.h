@@ -26,6 +26,12 @@ int tetrominoe_2[4][1] ={
     1,
     1
 };
+int tetrominoe_2_180[4][1] ={
+    1,
+    1,
+    1,
+    1
+};
 
 // Square
 int tetrominoe_3[2][2] = {
