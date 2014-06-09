@@ -338,18 +338,15 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
                 }
             }else if(rotacion_grados_ficha_actual == 270){
                 if(side == 1){ // Top
-                    for(int y = 0; y < 2; y++)
-                        for(int i = 0; i < 3; i++)
-                            game_area[posY + y][posX + i] = 0;
-
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                    game_area[posY][posX + 2]       = 0;
                 }else if(side == 2){ // Right
-                    for(int i = 0; i < 2; i++){
-                        game_area[posY + i][posX + 3] = 0;
-                    }
+                    game_area[posY][posX + 3]       = 0;
+                    game_area[posY + 1][posX + 3]   = 0;
                 }else if(side == 3){ //Left
-                    for(int i = 0; i < 2; i++){
-                        game_area[posY + i][posX] = 0;
-                    }
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY + 1][posX]       = 0;
                 }
             }
 
