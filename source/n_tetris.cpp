@@ -86,7 +86,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 4;//rand;
+    return 5;//rand;
 }
 
 
@@ -306,6 +306,24 @@ void clearOnRotate(int posX, int posY, int tipoFicha){
             }else if (rotacion_grados_ficha_actual == 270){
                 game_area[posY + 1][posX]           = 0;
                 game_area[posY + 2][posX]           = 0;
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else{
+                game_area[posY + 2][posX + 1]   = 0;
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else{
+                game_area[posY + 2][posX + 1]   = 0;
             }
         break;
     }
