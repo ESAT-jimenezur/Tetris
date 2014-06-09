@@ -42,17 +42,42 @@ int tetrominoe_4[3][2] ={
     0,1,
     1,1
 };
+int tetrominoe_4_90[2][3] ={
+    1,0,0,
+    1,1,1
+};
+int tetrominoe_4_180[3][2] ={
+    1,1,
+    1,0,
+    1,0
+};
+int tetrominoe_4_270[2][3] ={
+    1,1,1,
+    0,0,1
+};
+
+
 
 // S
 int tetrominoe_5[2][3] ={
-
     0,1,1,
     1,1,0
 };
+int tetrominoe_5_90[3][2] ={
+    1,0,
+    1,1,
+    0,1
+};
+
 
 // Z
 int tetrominoe_6[2][3] ={
 
     1,1,0,
     0,1,1
+};
+int tetrominoe_6_90[3][2] ={
+    0,1,
+    1,1,
+    1,0
 };
