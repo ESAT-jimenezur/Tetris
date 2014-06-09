@@ -26,11 +26,8 @@ int tetrominoe_2[4][1] ={
     1,
     1
 };
-int tetrominoe_2_180[4][1] ={
-    1,
-    1,
-    1,
-    1
+int tetrominoe_2_90[1][4] ={
+    1,1,1,1
 };
 
 // Square
