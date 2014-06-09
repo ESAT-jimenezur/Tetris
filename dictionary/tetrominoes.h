@@ -72,7 +72,6 @@ int tetrominoe_5_90[3][2] ={
 
 // Z
 int tetrominoe_6[2][3] ={
-
     1,1,0,
     0,1,1
 };
