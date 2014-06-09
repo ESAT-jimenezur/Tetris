@@ -66,6 +66,7 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void checkLines();
 void updatePoints();
 void rotate_piece(int posX, int posY, int tipoFicha);
+void clearOnRotate(int posX, int posY, int tipoFicha);
 
 void game_init(){
     seed();
@@ -85,7 +86,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 4;//rand;
+    return 2;//rand;
 }
 
 
@@ -186,8 +187,8 @@ void gameLoop(){
                 if(rotacion_grados_ficha_actual == 360){
                     rotacion_grados_ficha_actual = 0;
                 }
-
-                clearFichaSide(posX, posY, 1, ficha);
+                clearOnRotate(posX, posY, ficha);
+                //clearFichaSide(posX, posY, 1, ficha);
                 insertFicha(posX, posY, ficha);
 
 
@@ -253,6 +254,40 @@ void gameLoop(){
 
 }
 
+void clearOnRotate(int posX, int posY, int tipoFicha){
+
+    switch(tipoFicha){
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 1]       = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY + 2][posX]           = 0;
+                game_area[posY + 2][posX + 1]       = 0;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY + 1][posX]           = 0;
+                game_area[posY][posX + 2]           = 0;
+            }else if(rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX]               = 0;
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 2][posX + 1]       = 0;
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+
+            }else{
+                game_area[posY][posX]       = 0;
+                game_area[posY + 1][posX]   = 0;
+                game_area[posY + 2][posX]   = 0;
+                game_area[posY + 3][posX]   = 0;
+            }
+        break;
+    }
+
+}
 
 void drawGameArea(){
    int step = 0;
@@ -351,18 +386,31 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
             }
         break;
         case 2:
-            if(side == 1){ // Top
-                game_area[posY][posX]           = 0;
-            }else if(side == 2){ // Right
-                game_area[posY][posX + 1]       = 0;
-                game_area[posY + 1][posX + 1]   = 0;
-                game_area[posY + 2][posX + 1]   = 0;
-                game_area[posY + 3][posX + 1]   = 0;
-            }else if(side == 3){ //Left
-                game_area[posY][posX]           = 0;
-                game_area[posY + 1][posX]       = 0;
-                game_area[posY + 2][posX]       = 0;
-                game_area[posY + 3][posX]       = 0;
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                    game_area[posY + 2][posX + 1]   = 0;
+                    game_area[posY + 3][posX + 1]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 2][posX]       = 0;
+                    game_area[posY + 3][posX]       = 0;
+                }
+            }else{
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY][posX + 3]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 4]       = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                }
             }
         break;
         case 3:
@@ -604,10 +652,17 @@ void insertFicha(int posX, int posY, int tipoFicha){
             }
         break;
         case 2:
-            game_area[posY][posX]       = 2;
-            game_area[posY + 1][posX]   = 2;
-            game_area[posY + 2][posX]   = 2;
-            game_area[posY + 3][posX]   = 2;
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]       = 2;
+                game_area[posY + 1][posX]   = 2;
+                game_area[posY + 2][posX]   = 2;
+                game_area[posY + 3][posX]   = 2;
+            }else{
+                game_area[posY][posX]       = 2;
+                game_area[posY][posX + 1]   = 2;
+                game_area[posY][posX + 2]   = 2;
+                game_area[posY][posX + 3]   = 2;
+            }
         break;
         case 3:
             game_area[posY][posX]           = 3;
