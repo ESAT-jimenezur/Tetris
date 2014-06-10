@@ -88,7 +88,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 6;//rand;
+    return 1;//rand;
 }
 
 
@@ -128,14 +128,12 @@ void gameLoop(){
                     insertFicha(posX, posY, ficha);
                 }
             }else if(tecla == 72){ // Arriba
-
                 rotacion_grados_ficha_actual += 90;
                 if(rotacion_grados_ficha_actual == 360){
                     rotacion_grados_ficha_actual = 0;
                 }
                 clearOnRotate(posX, posY, ficha);
                 insertFicha(posX, posY, ficha);
-
             }else if(tecla == 75){ // Izquierda
                 if(!testCollisionLeft(posX, posY, ficha)){
                     posX--;
@@ -143,36 +141,15 @@ void gameLoop(){
                     clearFichaSide(posX, posY, 2, ficha);
                 }
             }else if(tecla == 77){ // Derecha
-                if(ficha == 2){
-                    if(game_area[posY][posX + 1] >= 9){
-
-                    }else{
-                        clearFichaSide(posX, posY, 3, ficha);
-                        posX++;
-                        insertFicha(posX, posY, ficha);
-
-                    }
-                }else{
-                    if(game_area[posY][posX + 2] >= 9){
-
-                    }else{
-                        clearFichaSide(posX, posY, 3, ficha);
-                        posX++;
-                        insertFicha(posX, posY, ficha);
-
-                    }
+                if(!testCollisionRight(posX, posY, ficha)){
+                    clearFichaSide(posX, posY, 3, ficha);
+                    posX++;
+                    insertFicha(posX, posY, ficha);
                 }
-
-
             }
-
-
-
         } // End kbhit
 
-
         // Gravedad
-
         t_ahora = time(NULL);		// Actualizamos el tiempo
         if ( t_ahora - t_ultimoTick > 0 ){ // Checkeamos si ha pasado 1 segundo desde la ultima caida de ficha (tick)
             //Comprobar que no caiga la ficha si hay cosas debajo
@@ -188,16 +165,8 @@ void gameLoop(){
             }
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
         }
-
-
-
-
-
      drawGameArea();
-
-
     }
-
 
 }
 
@@ -283,6 +252,87 @@ bool testCollisionLeft(int posX, int posY, int tipoFicha){
 }
 
 bool testCollisionRight(int posX, int posY, int tipoFicha){
+    switch (tipoFicha){
+
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX + 1] != 0 + game_area[posY + 1][posX + 1] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX + 3] != 0 || game_area[posY + 1][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 2] != 0 || game_area[posY + 3][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX + 3] != 0 || game_area[posY + 1][posX + 3] != 0){
+                    return true;
+                }
+            }
+        break;
+        /*
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0 || game_area[posY + 3][posX - 1] != 0){
+                    return true;
+                }
+            }else{
+                if(game_area[posY][posX - 1]){
+                    return true;
+                }
+            }
+        break;
+        case 3:
+            if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0){
+                return true;
+            }
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX] != 0 || game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1]){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX + 1] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0){
+                    return true;
+                }
+            }
+        break;
+        */
+    }
 }
 
 bool testCollisionBottom(int posX, int posY, int tipoFicha){
