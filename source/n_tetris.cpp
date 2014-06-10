@@ -164,9 +164,8 @@ void gameLoop(){
                         posY++;
                         insertFicha(posX, posY, ficha);
                     }
-                }else if(ficha == 5 || ficha == 6){
-                    /*
-                    if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6){
+                }else if(ficha == 5){
+                    if(testCollisionBottom(posX, posY, ficha)){
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -176,10 +175,7 @@ void gameLoop(){
                         posY++;
                         insertFicha(posX, posY, ficha);
                     }
-                    */
-                    clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
+
                 }
 
             }else if(tecla == 72){ // Arriba
