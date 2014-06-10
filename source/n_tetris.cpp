@@ -87,7 +87,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 1;//rand;
+    return 4;//rand;
 }
 
 
@@ -132,7 +132,7 @@ void gameLoop(){
                     }
 
                 }else if(ficha == 2){
-                    if(game_area[posY + 4][posX] >= 9 || game_area[posY + 4][posX] == 1 || game_area[posY + 4][posX] == 2 || game_area[posY + 4][posX] == 3 || game_area[posY + 4][posX] == 4 || game_area[posY + 4][posX] == 5 || game_area[posY + 4][posX] == 6){
+                    if(testCollisionBottom(posX, posY, ficha)){
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -143,7 +143,7 @@ void gameLoop(){
                         insertFicha(posX, posY, ficha);
                     }
                 }else if(ficha == 3){
-                    if(game_area[posY + 2][posX] >= 9 || game_area[posY + 2][posX] == 1 || game_area[posY + 2][posX] == 2 || game_area[posY + 2][posX] == 3 || game_area[posY + 2][posX] == 4 || game_area[posY + 2][posX] == 5 || game_area[posY + 2][posX] == 6       ||       game_area[posY + 2][posX + 1] == 9 || game_area[posY + 2][posX + 1] == 1 || game_area[posY + 2][posX + 1] == 2 || game_area[posY + 2][posX + 1] == 3 || game_area[posY + 2][posX + 1] == 4 || game_area[posY + 2][posX + 1] == 5 || game_area[posY + 2][posX + 1] == 6){
+                    if(testCollisionBottom(posX, posY, ficha)){
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -154,7 +154,7 @@ void gameLoop(){
                         insertFicha(posX, posY, ficha);
                     }
                 }else if(ficha == 4){
-                   if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6         ||       game_area[posY + 3][posX + 1] == 9 || game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
+                   if(testCollisionBottom(posX, posY, ficha)){
                         posY = starting_point_y;
                         posX = starting_point_x;
                         ficha = getFicha();
@@ -276,6 +276,25 @@ bool testCollisionBottom(int posX, int posY, int tipoFicha){
                     return true;
                 }
             }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 4][posX]){
+                    return true;
+                }
+            }else{
+                if(game_area[posY + 1][posX] || game_area[posY + 1][posX + 1] || game_area[posY + 1][posX + 2] || game_area[posY + 1][posX + 3]){
+                    return true;
+                }
+            }
+        break;
+        case 3:
+            if(game_area[posY + 2][posX] || game_area[posY + 2][posX + 1]){
+                return true;
+            }
+        break;
+        case 4:
+
         break;
     }
 
