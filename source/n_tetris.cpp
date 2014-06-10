@@ -88,7 +88,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 2;//rand;
+    return 3;//rand;
 }
 
 
@@ -224,21 +224,21 @@ bool testCollisionLeft(int posX, int posY, int tipoFicha){
         break;
         case 2:
             if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
-                if(game_area[posY + 4][posX] != 0){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0 || game_area[posY + 3][posX - 1] != 0){
                     return true;
                 }
             }else{
-                if(game_area[posY + 1][posX] || game_area[posY + 1][posX + 1] || game_area[posY + 1][posX + 2] || game_area[posY + 1][posX + 3]){
+                if(game_area[posY][posX - 1]){
                     return true;
                 }
             }
         break;
-        /*
         case 3:
             if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0){
                 return true;
             }
         break;
+        /*
         case 4:
             if(rotacion_grados_ficha_actual == 0){
                 if(game_area[posY + 3][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
