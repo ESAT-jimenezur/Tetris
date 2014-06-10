@@ -87,7 +87,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 6;//rand;
+    return 1;//rand;
 }
 
 
@@ -116,10 +116,18 @@ void gameLoop(){
             tecla=getch();
 
             if(tecla == 80){ // Abajo
-
+                if(testCollisionBottom(posX, posY, ficha)){
+                    posY = starting_point_y;
+                    posX = starting_point_x;
+                    ficha = getFicha();
+                    insertFicha(posX, posY, ficha); // ficha
+                }else{
+                    clearFichaSide(posX, posY, 1, ficha);
+                    posY++;
+                    insertFicha(posX, posY, ficha);
+                }
+                /*
                 if(ficha == 1){
-
-                    //if(game_area[posY + 3][posX] >= 9 || game_area[posY + 3][posX] == 1 || game_area[posY + 3][posX] == 2 || game_area[posY + 3][posX] == 3 || game_area[posY + 3][posX] == 4 || game_area[posY + 3][posX] == 5 || game_area[posY + 3][posX] == 6          ||         game_area[posY + 3][posX + 1] == 9 || game_area[posY + 3][posX + 1] == 1 || game_area[posY + 3][posX + 1] == 2 || game_area[posY + 3][posX + 1] == 3 || game_area[posY + 3][posX + 1] == 4 || game_area[posY + 3][posX + 1] == 5 || game_area[posY + 3][posX + 1] == 6){ // +4, porque 4 es el alto de la ficha
                     if(testCollisionBottom(posX, posY, ficha)){
                         posY = starting_point_y;
                         posX = starting_point_x;
@@ -188,7 +196,7 @@ void gameLoop(){
                     }
 
                 }
-
+                */
             }else if(tecla == 72){ // Arriba
 
                 //rotate_piece(posX, posY, ficha);
@@ -487,6 +495,7 @@ void clearFichaSide(int posX, int posY, int side, int tipoFicha){
                     game_area[posY][posX + 2]       = 0;
                 }else if(side == 2){ // Right
                     game_area[posY][posX + 3]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
                 }else if(side == 3){ //Left
                     game_area[posY][posX]           = 0;
                     game_area[posY + 1][posX]       = 0;
