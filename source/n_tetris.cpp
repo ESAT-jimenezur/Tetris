@@ -67,6 +67,8 @@ void checkLines();
 void updatePoints();
 void clearOnRotate(int posX, int posY, int tipoFicha);
 bool testCollisionBottom(int posX, int posY, int tipoFicha);
+bool testCollisionLeft(int posX, int posY, int tipoFicha);
+bool testCollisionRight(int posX, int posY, int tipoFicha);
 
 void game_init(){
     seed();
@@ -75,6 +77,8 @@ void game_init(){
     ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
     //Establecemos los colores iniciales
     system("color 08");
+    //Dibujamos los margenes
+    //drawMargins();
 
     srand(time(NULL));
 }
@@ -84,7 +88,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return rand;
+    return 2;//rand;
 }
 
 
@@ -125,21 +129,15 @@ void gameLoop(){
                 }
             }else if(tecla == 72){ // Arriba
 
-                //rotate_piece(posX, posY, ficha);
                 rotacion_grados_ficha_actual += 90;
                 if(rotacion_grados_ficha_actual == 360){
                     rotacion_grados_ficha_actual = 0;
                 }
                 clearOnRotate(posX, posY, ficha);
-                //clearFichaSide(posX, posY, 1, ficha);
                 insertFicha(posX, posY, ficha);
 
-
             }else if(tecla == 75){ // Izquierda
-
-                if(game_area[posY][posX - 1] >= 9){
-
-                }else{
+                if(!testCollisionLeft(posX, posY, ficha)){
                     posX--;
                     insertFicha(posX, posY, ficha);
                     clearFichaSide(posX, posY, 2, ficha);
@@ -201,6 +199,92 @@ void gameLoop(){
     }
 
 
+}
+
+bool testCollisionLeft(int posX, int posY, int tipoFicha){
+    switch (tipoFicha){
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX - 1] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 4][posX] != 0){
+                    return true;
+                }
+            }else{
+                if(game_area[posY + 1][posX] || game_area[posY + 1][posX + 1] || game_area[posY + 1][posX + 2] || game_area[posY + 1][posX + 3]){
+                    return true;
+                }
+            }
+        break;
+        /*
+        case 3:
+            if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0){
+                return true;
+            }
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 1][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 1][posX + 1] != 0 || game_area[posY + 2][posX + 2]){
+                    return true;
+                }
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2]){
+                    return true;
+                }
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 2][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2]){
+                    return true;
+                }
+            }
+        break;
+        */
+    }
+}
+
+bool testCollisionRight(int posX, int posY, int tipoFicha){
 }
 
 bool testCollisionBottom(int posX, int posY, int tipoFicha){
