@@ -61,11 +61,10 @@ void resetColors();
 void drawGameArea();
 void insertFicha(int posX, int posY, int tipoFicha);
 void gameLoop();
-int getFicha();
+int  getFicha();
 void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void checkLines();
 void updatePoints();
-//void rotate_piece(int posX, int posY, int tipoFicha);  --> Delete
 void clearOnRotate(int posX, int posY, int tipoFicha);
 bool testCollisionBottom(int posX, int posY, int tipoFicha);
 
@@ -76,8 +75,6 @@ void game_init(){
     ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
     //Establecemos los colores iniciales
     system("color 08");
-    //Dibujamos los margenes
-    //drawMargins();
 
     srand(time(NULL));
 }
@@ -87,7 +84,7 @@ int getFicha(){
     int rand = aleatorio(5) + 1;
 
     rotacion_grados_ficha_actual = 0;
-    return 1;//rand;
+    return rand;
 }
 
 
@@ -126,77 +123,6 @@ void gameLoop(){
                     posY++;
                     insertFicha(posX, posY, ficha);
                 }
-                /*
-                if(ficha == 1){
-                    if(testCollisionBottom(posX, posY, ficha)){
-                        posY = starting_point_y;
-                        posX = starting_point_x;
-                        ficha = getFicha();
-                        insertFicha(posX, posY, ficha); // ficha
-                    }else{
-                        clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
-                    }
-
-                }else if(ficha == 2){
-                    if(testCollisionBottom(posX, posY, ficha)){
-                        posY = starting_point_y;
-                        posX = starting_point_x;
-                        ficha = getFicha();
-                        insertFicha(posX, posY, ficha); // ficha
-                    }else{
-                        clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
-                    }
-                }else if(ficha == 3){
-                    if(testCollisionBottom(posX, posY, ficha)){
-                        posY = starting_point_y;
-                        posX = starting_point_x;
-                        ficha = getFicha();
-                        insertFicha(posX, posY, ficha); // ficha
-                    }else{
-                        clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
-                    }
-                }else if(ficha == 4){
-                   if(testCollisionBottom(posX, posY, ficha)){
-                        posY = starting_point_y;
-                        posX = starting_point_x;
-                        ficha = getFicha();
-                        insertFicha(posX, posY, ficha); // ficha
-                    }else{
-                        clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
-                    }
-                }else if(ficha == 5){
-                    if(testCollisionBottom(posX, posY, ficha)){
-                        posY = starting_point_y;
-                        posX = starting_point_x;
-                        ficha = getFicha();
-                        insertFicha(posX, posY, ficha); // ficha
-                    }else{
-                        clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
-                    }
-                }else if(ficha == 6){
-                    if(testCollisionBottom(posX, posY, ficha)){
-                        posY = starting_point_y;
-                        posX = starting_point_x;
-                        ficha = getFicha();
-                        insertFicha(posX, posY, ficha); // ficha
-                    }else{
-                        clearFichaSide(posX, posY, 1, ficha);
-                        posY++;
-                        insertFicha(posX, posY, ficha);
-                    }
-
-                }
-                */
             }else if(tecla == 72){ // Arriba
 
                 //rotate_piece(posX, posY, ficha);
@@ -248,17 +174,23 @@ void gameLoop(){
 
 
         // Gravedad
-/*
+
         t_ahora = time(NULL);		// Actualizamos el tiempo
         if ( t_ahora - t_ultimoTick > 0 ){ // Checkeamos si ha pasado 1 segundo desde la ultima caida de ficha (tick)
-
             //Comprobar que no caiga la ficha si hay cosas debajo
-            clearFichaSide(posX, posY, 1, ficha);
-            posY++;
-            insertFicha(posX, posY, ficha);
+            if(testCollisionBottom(posX, posY, ficha)){
+                posY = starting_point_y;
+                posX = starting_point_x;
+                ficha = getFicha();
+                insertFicha(posX, posY, ficha); // ficha
+            }else{
+                clearFichaSide(posX, posY, 1, ficha);
+                posY++;
+                insertFicha(posX, posY, ficha);
+            }
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
         }
-*/
+
 
 
 
@@ -462,7 +394,7 @@ void drawGameArea(){
                 printf("%d", game_area[j][i]);
             }else if(game_area[j][i] == 0){ // Vacio
                 setColors(1, 15);
-                printf("%d", game_area[j][i]);
+                printf(" ", game_area[j][i]);
             }
 
         }
