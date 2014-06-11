@@ -69,6 +69,7 @@ void clearOnRotate(int posX, int posY, int tipoFicha);
 bool testCollisionBottom(int posX, int posY, int tipoFicha);
 bool testCollisionLeft(int posX, int posY, int tipoFicha);
 bool testCollisionRight(int posX, int posY, int tipoFicha);
+int getNextFicha();
 
 void game_init(){
     seed();
@@ -83,12 +84,12 @@ void game_init(){
     srand(time(NULL));
 }
 
+
 int getFicha(){
     checkLines(); // --> Dentro redibujamos
     int rand = aleatorio(6) + 1;
-
     rotacion_grados_ficha_actual = 0;
-    return 7;//rand;
+    return rand;
 }
 
 
