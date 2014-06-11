@@ -4,6 +4,9 @@
 #include <string.h>
 #include <windows.h>
 
+/* Public Global Vars */
+const int anchoVentana                = 150;
+const int altoVentana                 = 100;
 
 struct Fecha{
     char dia[10];
@@ -150,7 +153,7 @@ void lista_jugadores(){
     while(!feof(fichero_datos)){
     fread(&jugador, sizeof(jugador), 1, fichero_datos);
     if(!feof(fichero_datos)){
-        printf("%s %s %s %s %s %c \n \n",
+        printf("%s %s %s %s %s %d \n \n",
            jugador.usuario,
            jugador.nombre,
            jugador.apellido1,
@@ -302,10 +305,10 @@ void menu(){
 int main(){
     /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
     //Nuestra ventana molona bien grande
-    ventanaConsola(150, 100, "iJosTris Admin backend");
+    ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris Admin Backend");
 
     //Establecemos los colores iniciales
-    setColors(0, 14);
+    system("color 08");
 
     menu();
 
