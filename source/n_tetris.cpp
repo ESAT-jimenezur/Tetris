@@ -23,6 +23,7 @@ const int gameFicha_ascii_model       = 178;
 int rotacion_grados_ficha_actual      = 0;
 
 int CREDITOS = 0;
+char CURRENT_USER[20] = "NO USER";
 
 // Puntos
 int PUNTOS                            = 0; // Iniciamos los puntos a 0
@@ -93,6 +94,7 @@ int  getFicha(int posX, int posY);
 void checkLines();
 void updatePoints();
 void drawCredits();
+void drawCurrentUser();
 void checkGameLost(int posX, int posY);
 void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void clearOnRotate(int posX, int posY, int tipoFicha);
@@ -1007,8 +1009,16 @@ void drawCredits(){
 
 }
 
+void drawCurrentUser(){
+
+
+    cursorPos(3, gameInterface_size_height + 6);
+    printf("User: %s", CURRENT_USER);
+
+}
+
 void checkGameLost(int posX, int posY){
-    if(game_area[posY + 4][posX] != 0){
+    if(game_area[posY + 4][posX - 4] != 0 || game_area[posY + 4][posX - 3] != 0 ||  game_area[posY + 4][posX - 2] != 0 || game_area[posY + 4][posX - 1] != 0 || game_area[posY + 4][posX + 1] != 0 || game_area[posY + 4][posX + 2] || game_area[posY + 4][posX + 3] || game_area[posY + 4][posX + 4] != 0 || game_area[posY + 4][posX + 5] != 0){
         game_alive = 0;
     }
 }
@@ -1173,7 +1183,7 @@ bool login_access(){
                 printf("Login Correcto\n\n");
                 printf("Pulsa cualquier tecla para iniciar partida");
                 getch();
-
+                strcpy(CURRENT_USER, jugador.usuario);
                 CREDITOS = jugador.fichas;
                 keep_searching = false;
                 lets_play = true;
@@ -1220,7 +1230,7 @@ void game_finished(){
 
     system("cls");
     printf("*** ------------ *** iJosTris *** ------------ ***\n");
-    printf("*** --------- /\Partida Finalizada/\ --------- ***\n");
+    printf("*** --------- /\\Partida Finalizada/\\ --------- ***\n");
     printf("*** ------------------------------------------ ***\n");
 
 
@@ -1229,14 +1239,15 @@ void game_finished(){
 
 int main(){
 
-    //if(login()){
+    if(login()){
         /*TODO*/
         game_init();
         drawGameArea();
         updatePoints();
         drawCredits();
+        drawCurrentUser();
         gameLoop();
-    //}
+    }
 
 
     return 0;
