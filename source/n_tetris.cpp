@@ -1203,7 +1203,7 @@ bool login_access(){
 
     fichero_datos = fopen("../database/players_database.dat", "rb");
 
-    while(!feof(fichero_datos)){
+    while(!feof(fichero_datos) || keep_searching){
 
     fread(&jugador, sizeof(jugador), 1, fichero_datos);
 
@@ -1265,8 +1265,9 @@ void game_finished(){
     printf("*** --------- /\\Partida Finalizada/\\ --------- ***\n");
     printf("*** ------------------------------------------ ***\n\n\n");
 
-    printf("Guardando PUNTUACION (%d) Y CREDITOS (%d) PARA EL JUGADOR %s", PUNTOS, CREDITOS, CURRENT_USER);
+    printf("Guardando PUNTUACION (%d) Y CREDITOS (%d) PARA EL JUGADOR %s \n", PUNTOS, CREDITOS, CURRENT_USER);
 
+/*
     fichero_datos = fopen("../database/players_database.dat", "r+");
     int apuntador = 0;
 
@@ -1275,19 +1276,21 @@ void game_finished(){
     fread(&jugador, sizeof(jugador), 1, fichero_datos);
 
         if(!feof(fichero_datos) || keep_searching){
-            if(strcmp(strupr(jugador.usuario), strupr(CURRENT_USER))){
+            if(strcmp(strupr(jugador.usuario), strupr(CURRENT_USER)) == 0){
                 fseek(fichero_datos, sizeof(jugador) * apuntador, SEEK_SET);
                 jugador.fichas = CREDITOS;
                 jugador.high_score = PUNTOS;
                 fwrite(&jugador, sizeof(jugador), 1, fichero_datos);
                 keep_searching = false;
+                //printf("Guardado con EXITO");
             }
+            apuntador++
         }
-        apuntador++;
+
     }
     fclose(fichero_datos);
-
-    getch();
+*/
+    exit(1);
 }
 
 int main(){

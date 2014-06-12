@@ -150,12 +150,12 @@ void lista_jugadores(){
     fichero_datos = fopen("../database/players_database.dat", "rb");
 
     printf("\n *************** Lista de Jugadores *************** \n\n");
-
+    printf("Usuario Nombre 1erApellido 2oApellido    Email        Fichas HighScore \n \n");
 
     while(!feof(fichero_datos)){
     fread(&jugador, sizeof(jugador), 1, fichero_datos);
     if(!feof(fichero_datos)){
-        printf("Usuario Nombre 1erApellido 2oApellido    Email        Fichas HighScore \n \n");
+
         printf("  %s   %s   %s    %s    %s    %d     %d \n \n",
            jugador.usuario,
            jugador.nombre,
