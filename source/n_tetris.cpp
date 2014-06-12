@@ -21,11 +21,38 @@ const int gameFicha_ascii_model       = 178;
 //Rotacion
 int rotacion_grados_ficha_actual      = 0;
 
+int CREDITOS = 0;
+
 // Puntos
 int PUNTOS                            = 0; // Iniciamos los puntos a 0
 int PUNTOS_LINEA                      = 10;
 int PUNTOS_TETRIS                     = 100;
 
+struct Fecha{
+    char dia[10];
+    char mes[10];
+    char anyo[10];
+};
+
+struct Lugar{
+    char provincia[20];
+    char pais[20];
+};
+
+struct Jugador{
+    char usuario[20];
+    char pass[20];
+    char nombre[20];
+    char apellido1[20];
+    char apellido2[20];
+    char email[40];
+    int fichas;
+    bool activo;
+    Fecha fecha_nacimiento;
+    Lugar lugar_nacimiento;
+};
+
+Jugador jugador;
 
 int game_area[23][12] = {
     9,8,8,8,8,8,8,8,8,8,8,9,
@@ -65,11 +92,12 @@ int  getFicha();
 void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void checkLines();
 void updatePoints();
+void drawCredits();
 void clearOnRotate(int posX, int posY, int tipoFicha);
 bool testCollisionBottom(int posX, int posY, int tipoFicha);
 bool testCollisionLeft(int posX, int posY, int tipoFicha);
 bool testCollisionRight(int posX, int posY, int tipoFicha);
-int getNextFicha();
+bool login();
 
 void game_init(){
     seed();
@@ -149,7 +177,7 @@ void gameLoop(){
                 }
             }
         } // End kbhit
-/*
+
         // Gravedad
         t_ahora = time(NULL);		// Actualizamos el tiempo
         if ( t_ahora - t_ultimoTick > 0 ){ // Checkeamos si ha pasado 1 segundo desde la ultima caida de ficha (tick)
@@ -166,7 +194,7 @@ void gameLoop(){
             }
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
 
-        }*/
+        }
      drawGameArea();
     }
 
@@ -957,6 +985,22 @@ void updatePoints(){
     printf("%d", PUNTOS);
 }
 
+void drawCredits(){
+
+    for(int y = 10; y < 13; y++){
+        for(int x = 10; x <= 20; x++){
+            cursorPos(gameInterface_size_width + x, y);
+            printf(" ");
+        }
+    }
+    cursorPos(gameInterface_size_width + 10, 10);
+    printf("---COINS---");
+
+    cursorPos(gameInterface_size_width + 14, 12);
+    printf("%d", CREDITOS);
+
+}
+
 void insertFicha(int posX, int posY, int tipoFicha){
     switch (tipoFicha){
         case 1:
@@ -1086,15 +1130,91 @@ void resetColors(){
     setColors(1, 15);
 }
 
+bool login_access(){
+
+    FILE *fichero_datos;
+
+    char usuario[20];
+    char pass[20];
+    bool keep_searching = true;
+    bool lets_play = false;
+
+    system("cls");
+    printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
+    printf("Nombre de Usuario: ");
+    scanf("%s", &usuario);
+    fflush(stdin);
+
+    printf("Password: ");
+    scanf("%s", &pass);
+    fflush(stdin);
+    printf("\n");
+
+    fichero_datos = fopen("../database/players_database.dat", "rb");
+
+    while(!feof(fichero_datos)){
+
+    fread(&jugador, sizeof(jugador), 1, fichero_datos);
+
+        if(!feof(fichero_datos) || keep_searching){
+            if(strcmp(strupr(jugador.usuario), strupr(usuario)) == 0 && strcmp(strupr(jugador.pass), strupr(pass)) == 0 ){
+                printf("Login Correcto\n\n");
+                printf("Pulsa cualquier tecla para iniciar partida");
+                getch();
+
+                CREDITOS = jugador.fichas;
+                keep_searching = false;
+                lets_play = true;
+            }
+        }
+    }
+    fclose(fichero_datos);
+    if(lets_play){
+        return true;
+    }
+}
+
+bool login(){
+    int elec;
+
+    do{
+        system("cls");
+        printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
+        printf("1.- Jugar\n");
+        printf("2.- Maximas puntuaciones\n\n\n");
+        printf("5.- Salir \n\n");
+
+        scanf("%d", &elec);
+
+
+        switch(elec){
+            case 1:
+                while(login_access()){
+                    return true;
+                }
+            break;
+            case 2:
+
+            break;
+
+            case 5:
+                return false;
+        }
+
+    }while(elec != 6);
+}
+
 int main(){
 
-    game_init();
+    if(login()){
+        /*TODO*/
+        game_init();
+        drawGameArea();
+        updatePoints();
+        drawCredits();
+        gameLoop();
+    }
 
-    drawGameArea();
-
-    updatePoints();
-
-    gameLoop();
 
     return 0;
 }
