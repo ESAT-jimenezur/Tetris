@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <iJos.h>
-#include<conio.h>
+#include <conio.h>
 #include <string.h>
-#include <dictionary.h>
-#include <tetrominoes.h>
 
 /* Public Global Vars */
 bool game_alive                       = 1;
@@ -1232,8 +1230,8 @@ bool login(){
         system("cls");
         printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
         printf("1.- Jugar\n");
-        printf("2.- Maximas puntuaciones\n\n\n");
-        printf("5.- Salir \n\n");
+        //printf("2.- Maximas puntuaciones\n\n\n");
+        printf("3.- Salir \n\n");
 
         scanf("%d", &elec);
 
@@ -1248,11 +1246,11 @@ bool login(){
 
             break;
 
-            case 5:
+            case 3:
                 return false;
         }
 
-    }while(elec != 6);
+    }while(elec != 3);
 }
 
 void game_finished(){
@@ -1297,7 +1295,6 @@ int main(){
     //Establecemos los colores iniciales
     system("color 08");
     if(login()){
-        /*TODO*/
         game_init();
         drawGameArea();
         updatePoints();
