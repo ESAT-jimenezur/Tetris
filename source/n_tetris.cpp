@@ -49,6 +49,7 @@ struct Jugador{
     char apellido2[20];
     char email[40];
     int fichas;
+    int high_score;
     bool activo;
     Fecha fecha_nacimiento;
     Lugar lugar_nacimiento;
@@ -95,6 +96,7 @@ void checkLines();
 void updatePoints();
 void drawCredits();
 void drawCurrentUser();
+void drawHighScores();
 void checkGameLost(int posX, int posY);
 void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void clearOnRotate(int posX, int posY, int tipoFicha);
@@ -110,11 +112,6 @@ void game_init(){
     /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
     //Nuestra ventana molona bien grande
     ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
-    //Establecemos los colores iniciales
-    system("color 08");
-    //Dibujamos los margenes
-    //drawMargins();
-
     srand(time(NULL));
 }
 
@@ -1010,17 +1007,49 @@ void drawCredits(){
 }
 
 void drawCurrentUser(){
-
-
     cursorPos(3, gameInterface_size_height + 6);
     printf("User: %s", CURRENT_USER);
-
 }
 
 void checkGameLost(int posX, int posY){
-    if(game_area[posY + 4][posX - 4] != 0 || game_area[posY + 4][posX - 3] != 0 ||  game_area[posY + 4][posX - 2] != 0 || game_area[posY + 4][posX - 1] != 0 || game_area[posY + 4][posX + 1] != 0 || game_area[posY + 4][posX + 2] || game_area[posY + 4][posX + 3] || game_area[posY + 4][posX + 4] != 0 || game_area[posY + 4][posX + 5] != 0){
+    if(game_area[posY + 4][posX - 4] != 0 || game_area[posY + 4][posX - 3] != 0 ||  game_area[posY + 4][posX - 2] != 0 || game_area[posY + 4][posX - 1] != 0 || game_area[posY + 4][posX] != 0 || game_area[posY + 4][posX + 1] != 0 || game_area[posY + 4][posX + 2] || game_area[posY + 4][posX + 3] || game_area[posY + 4][posX + 4] != 0 || game_area[posY + 4][posX + 5] != 0){
+        CREDITOS--;
         game_alive = 0;
     }
+}
+
+void drawHighScores(){
+
+    FILE *fichero_datos;
+
+    int x = 50;
+    int y = 2;
+
+    cursorPos(x, y);
+    setColors(0, 9);
+    printf("High Scores\n");
+
+    y = y + 2;
+    cursorPos(x - 3, y);
+    printf("User       Score \n \n");
+    fichero_datos = fopen("../database/players_database.dat", "rb");
+
+    y = y + 1;
+
+    setColors(0, 3);
+    while(!feof(fichero_datos)){
+    fread(&jugador, sizeof(jugador), 1, fichero_datos);
+    if(!feof(fichero_datos)){
+        y++;
+        cursorPos(x - 3,y);
+        printf("%s        %d \n \n",
+           jugador.usuario,
+           jugador.high_score);
+        }
+
+    }
+    fclose(fichero_datos);
+
 }
 
 void insertFicha(int posX, int posY, int tipoFicha){
@@ -1228,17 +1257,42 @@ bool login(){
 
 void game_finished(){
 
+    FILE *fichero_datos;
+    bool keep_searching = true;
+
     system("cls");
     printf("*** ------------ *** iJosTris *** ------------ ***\n");
     printf("*** --------- /\\Partida Finalizada/\\ --------- ***\n");
-    printf("*** ------------------------------------------ ***\n");
+    printf("*** ------------------------------------------ ***\n\n\n");
 
+    printf("Guardando PUNTUACION (%d) Y CREDITOS (%d) PARA EL JUGADOR %s", PUNTOS, CREDITOS, CURRENT_USER);
+
+    fichero_datos = fopen("../database/players_database.dat", "r+");
+    int apuntador = 0;
+
+    while(!feof(fichero_datos)){
+
+    fread(&jugador, sizeof(jugador), 1, fichero_datos);
+
+        if(!feof(fichero_datos) || keep_searching){
+            if(strcmp(strupr(jugador.usuario), strupr(CURRENT_USER))){
+                fseek(fichero_datos, sizeof(jugador) * apuntador, SEEK_SET);
+                jugador.fichas = CREDITOS;
+                jugador.high_score = PUNTOS;
+                fwrite(&jugador, sizeof(jugador), 1, fichero_datos);
+                keep_searching = false;
+            }
+        }
+        apuntador++;
+    }
+    fclose(fichero_datos);
 
     getch();
 }
 
 int main(){
-
+    //Establecemos los colores iniciales
+    system("color 08");
     if(login()){
         /*TODO*/
         game_init();
@@ -1246,9 +1300,9 @@ int main(){
         updatePoints();
         drawCredits();
         drawCurrentUser();
+        drawHighScores();
         gameLoop();
     }
-
 
     return 0;
 }

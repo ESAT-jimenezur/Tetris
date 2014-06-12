@@ -27,6 +27,7 @@ struct Jugador{
     char apellido2[20];
     char email[40];
     int fichas;
+    int high_score;
     bool activo;
     Fecha fecha_nacimiento;
     Lugar lugar_nacimiento;
@@ -119,6 +120,7 @@ void pedirDatos(){
         //Activamos el jugador y establecemos sus fichas
         jugador.activo = true;
         jugador.fichas = 10;
+        jugador.high_score = 0;
 }
 
 
@@ -153,13 +155,15 @@ void lista_jugadores(){
     while(!feof(fichero_datos)){
     fread(&jugador, sizeof(jugador), 1, fichero_datos);
     if(!feof(fichero_datos)){
-        printf("%s %s %s %s %s %d \n \n",
+        printf("Usuario Nombre 1erApellido 2oApellido    Email        Fichas HighScore \n \n");
+        printf("  %s   %s   %s    %s    %s    %d     %d \n \n",
            jugador.usuario,
            jugador.nombre,
            jugador.apellido1,
            jugador.apellido2,
            jugador.email,
-           jugador.fichas);
+           jugador.fichas,
+           jugador.high_score);
         }
     }
 
