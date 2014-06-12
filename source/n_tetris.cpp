@@ -6,6 +6,7 @@
 #include <tetrominoes.h>
 
 /* Public Global Vars */
+bool game_alive                       = 1;
 const int anchoVentana                = 150;
 const int altoVentana                 = 100;
 
@@ -88,16 +89,19 @@ void resetColors();
 void drawGameArea();
 void insertFicha(int posX, int posY, int tipoFicha);
 void gameLoop();
-int  getFicha();
-void clearFichaSide(int posX, int posY, int side, int tipoFicha);
+int  getFicha(int posX, int posY);
 void checkLines();
 void updatePoints();
 void drawCredits();
+void checkGameLost(int posX, int posY);
+void clearFichaSide(int posX, int posY, int side, int tipoFicha);
 void clearOnRotate(int posX, int posY, int tipoFicha);
 bool testCollisionBottom(int posX, int posY, int tipoFicha);
 bool testCollisionLeft(int posX, int posY, int tipoFicha);
 bool testCollisionRight(int posX, int posY, int tipoFicha);
 bool login();
+void game_finished();
+
 
 void game_init(){
     seed();
@@ -112,21 +116,20 @@ void game_init(){
     srand(time(NULL));
 }
 
-
-int getFicha(){
+int getFicha(int posX, int posY){
     checkLines(); // --> Dentro redibujamos
+    checkGameLost(posX, posY);
     int rand = aleatorio(6) + 1;
     rotacion_grados_ficha_actual = 0;
     return rand;
 }
-
 
 void gameLoop(){
     char tecla;
     int posY = starting_point_y;
     int posX = starting_point_x;
 
-    int ficha = getFicha();
+    int ficha = getFicha(posX, posY);
 
     insertFicha(posX, posY, ficha); // ficha
 
@@ -139,7 +142,7 @@ void gameLoop(){
         t_ultimoTick = time(NULL);
     }
 
-    while(true) {
+    while(true && game_alive) {
 
         if(kbhit()){
             fflush(stdin);
@@ -149,7 +152,7 @@ void gameLoop(){
                 if(testCollisionBottom(posX, posY, ficha)){
                     posY = starting_point_y;
                     posX = starting_point_x;
-                    ficha = getFicha();
+                    ficha = getFicha(posX, posY);
                     insertFicha(posX, posY, ficha); // ficha
                 }else{
                     clearFichaSide(posX, posY, 1, ficha);
@@ -185,7 +188,7 @@ void gameLoop(){
             if(testCollisionBottom(posX, posY, ficha)){
                 posY = starting_point_y;
                 posX = starting_point_x;
-                ficha = getFicha();
+                ficha = getFicha(posX, posY);
                 insertFicha(posX, posY, ficha); // ficha
             }else{
                 clearFichaSide(posX, posY, 1, ficha);
@@ -195,8 +198,11 @@ void gameLoop(){
             t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
 
         }
+
      drawGameArea();
     }
+
+    game_finished();
 
 }
 
@@ -1001,6 +1007,12 @@ void drawCredits(){
 
 }
 
+void checkGameLost(int posX, int posY){
+    if(game_area[posY + 4][posX] != 0){
+        game_alive = 0;
+    }
+}
+
 void insertFicha(int posX, int posY, int tipoFicha){
     switch (tipoFicha){
         case 1:
@@ -1204,16 +1216,27 @@ bool login(){
     }while(elec != 6);
 }
 
+void game_finished(){
+
+    system("cls");
+    printf("*** ------------ *** iJosTris *** ------------ ***\n");
+    printf("*** --------- /\Partida Finalizada/\ --------- ***\n");
+    printf("*** ------------------------------------------ ***\n");
+
+
+    getch();
+}
+
 int main(){
 
-    if(login()){
+    //if(login()){
         /*TODO*/
         game_init();
         drawGameArea();
         updatePoints();
         drawCredits();
         gameLoop();
-    }
+    //}
 
 
     return 0;
