@@ -1,344 +1,1308 @@
 #include <stdio.h>
 #include <iJos.h>
-#include<conio.h>
+#include <conio.h>
 #include <string.h>
-#include <dictionary.h>
-#include <tetrominoes.h>
 
-
-
-
-
-/* Public Vars */
-const int anchoVentana      = 150;
-const int altoVentana       = 100;
+/* Public Global Vars */
+bool game_alive                       = 1;
+const int anchoVentana                = 150;
+const int altoVentana                 = 100;
 
 const int gameInterface_size_height   = 20;
 const int gameInterface_size_width    = 10;
-const int gameInterface_size_margin   = 2;
-const int gameInterface_position_X    = 10;
-const int gameInterface_position_Y    = 10;
+const int gameInterface_margin        = 2;
+
+const int starting_point_x            = 5;
+const int starting_point_y            = 2;
 
 const int gameFicha_ascii_model       = 178;
 
-const int ficha_size                  = 4;
-int currentFicha_X                    = 0;
-int currentFicha_Y                    = 0;
+//Rotacion
+int rotacion_grados_ficha_actual      = 0;
 
-int game_zone_table[gameInterface_size_height][gameInterface_size_width];
+int CREDITOS = 0;
+char CURRENT_USER[20] = "NO USER";
+
+// Puntos
+int PUNTOS                            = 0; // Iniciamos los puntos a 0
+int PUNTOS_LINEA                      = 10;
+int PUNTOS_TETRIS                     = 100;
+
+struct Fecha{
+    char dia[10];
+    char mes[10];
+    char anyo[10];
+};
+
+struct Lugar{
+    char provincia[20];
+    char pais[20];
+};
+
+struct Jugador{
+    char usuario[20];
+    char pass[20];
+    char nombre[20];
+    char apellido1[20];
+    char apellido2[20];
+    char email[40];
+    int fichas;
+    int high_score;
+    bool activo;
+    Fecha fecha_nacimiento;
+    Lugar lugar_nacimiento;
+};
+
+Jugador jugador;
+
+int game_area[23][12] = {
+    9,8,8,8,8,8,8,8,8,8,8,9,
+    9,8,8,8,8,8,8,8,8,8,8,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,0,0,0,0,0,0,0,0,0,0,9,
+    9,9,9,9,9,9,9,9,9,9,9,9
+};
 
 
-
-/* Definimos los métodos necesarios */
-
-/**
-    Este método se encarga de mostrar el menu por pantalla
-**/
-void menu();
-
-/**
-    Este método se encarga de establecer los colores necesarios para la ejecucion
-**/
+/* Method declarations */
+void game_init();
 void setColors(int texto, int fondo);
-void drawGameInterface(int posX, int posY, int size);
-void insertFicha(int game_zone_table_X, int game_zone_table_Y);
-void drawFicha(int posX, int posY, int tipoFicha);
-void clearBlock(int posX, int opsY, int size);
+void resetColors();
+void drawGameArea();
+void insertFicha(int posX, int posY, int tipoFicha);
+void gameLoop();
+int  getFicha(int posX, int posY);
+void checkLines();
+void updatePoints();
+void drawCredits();
+void drawCurrentUser();
+void drawHighScores();
+void checkGameLost(int posX, int posY);
+void clearFichaSide(int posX, int posY, int side, int tipoFicha);
+void clearOnRotate(int posX, int posY, int tipoFicha);
+bool testCollisionBottom(int posX, int posY, int tipoFicha);
+bool testCollisionLeft(int posX, int posY, int tipoFicha);
+bool testCollisionRight(int posX, int posY, int tipoFicha);
+bool login();
+void game_finished();
 
 
-
-void loader_game_zone_table(){
-    for(int i = 0; i < gameInterface_size_height; i++){
-        for(int j = 0; j < gameInterface_size_width; j++){
-            game_zone_table[i][j] = 0;
-        }
-    }
+void game_init(){
+    seed();
+    /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
+    //Nuestra ventana molona bien grande
+    ventanaConsola(anchoVentana/2, altoVentana/2, "iJosTris");
+    srand(time(NULL));
 }
 
-void convierteTextoAASCII(int posX, int posY, char* titulo){
-
-    cursorPos(posX, posY);
-
-    // Tratar cadena para descomprimir por caracter
-    // Convertir cada caracter a ASCII
-    // Imprimir caracter en ascii
-
-    for(int le = 0;  le < strlen(titulo); le++){
-        printf("%c", titulo[le]);
-        // Aqui convertimos
-        /*
-        for(int i = 0; i < 7; i++){
-            for(int j = 0; j < 5; j++){
-                //A[i][j]
-
-
-                if(letra[i][j] == 1){
-                    printf("%c", 219);
-                }else{
-                    printf(" ");
-                }
-
-            }
-
-            posY++;
-            printf("\n");
-            cursorPos(posX, posY);
-        }
-        */
-
-    }
-
+int getFicha(int posX, int posY){
+    checkLines(); // --> Dentro redibujamos
+    checkGameLost(posX, posY);
+    int rand = aleatorio(6) + 1;
+    rotacion_grados_ficha_actual = 0;
+    return rand;
 }
 
-void pantallaJuego(){
-    // Este metodo se llama 1 vez y pinta toda la zona de juego
-    // Establecemos el color de fondo
-    system("color 80");
-
-    char titulo[10] = "Tetris";
-
-
-    //Cargamos el array de juego
-    loader_game_zone_table();
-
-    //convierteTextoAASCII(anchoVentana/2 - (strlen(titulo)/2), 2, titulo);
-
-    drawGameInterface(gameInterface_position_X, gameInterface_position_Y, ficha_size);
-
-    //YEAH --> drawFicha(0, 0, 1);
-
-    int posficha1_X = (gameInterface_size_width * ficha_size) / 2;
-
-    drawFicha(posficha1_X,0,1);
-
-    int posFicha_X = posficha1_X;
-    int posFicha_Y = 0;
-
-
-
-    // Tiempo Inicial
-    struct tm *HoraFechaActual;
-    time_t tiempo=time(NULL);
-    int hh_ini,mm_ini,ss_ini;
+void gameLoop(){
     char tecla;
-    time (&tiempo);
-    HoraFechaActual = localtime(&tiempo);
+    int posY = starting_point_y;
+    int posX = starting_point_x;
 
-    hh_ini=HoraFechaActual->tm_hour;
-    mm_ini=HoraFechaActual->tm_min;
-    ss_ini=HoraFechaActual->tm_sec;
+    int ficha = getFicha(posX, posY);
 
+    insertFicha(posX, posY, ficha); // ficha
 
+    //Variables para el tiempo
+    time_t t_ultimoTick;		// Tiempo desde la ultima vez que una pieza bajo
+    time_t t_ahora;				// Tiempo actual
+    t_ultimoTick = time(NULL);
 
+    while( t_ahora - t_ultimoTick == 0 ){
+        t_ultimoTick = time(NULL);
+    }
 
+    while(true && game_alive) {
 
-
-    while(true) {
-
-
-
-        //Calculamos la diferencia de tiempos
-        time_t tiempo=time(NULL);
-        time (&tiempo);
-        struct tm *HoraSiguiente = localtime(&tiempo);
-
-        //Esta es la estructura
-        int hh=HoraFechaActual->tm_hour;
-        int mm=HoraFechaActual->tm_min;
-        int ss=HoraFechaActual->tm_sec;
-
-
-        /*  Auto movimiento
-        int t_diff = 0;
-        if((HoraSiguiente->tm_sec - ss_ini) + t_diff == 1){
-            // Gravedad
-            clearBlock(posFicha_X, posFicha_Y, ficha_size);
-
-            if(posFicha_Y < (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size){
-                posFicha_Y = posFicha_Y + ficha_size;
-                drawFicha(posFicha_X, posFicha_Y, 1);
-            }
-            t_diff++;
-
-            cursorPos(10,10);
-
-
-            //printf("%d %d", HoraSiguiente->tm_sec - ss_ini, ss_ini);
-        }
-
-
-        //printf("%d:%d:%d \n", hh_ini, mm_ini, ss_ini);
-        //printf("%d:%d:%d \n", hh, mm, ss);
-        //printf("Diff: ");
-        */
-
-        /* TO-DO*/
         if(kbhit()){
             fflush(stdin);
             tecla=getch();
 
-            //printf("%d %d", posFicha_X, (gameInterface_size_width - gameInterface_size_margin/2)*ficha_size);
-
-            //clearBlock(posFicha_X, posFicha_Y, ficha_size);
             if(tecla == 80){ // Abajo
-                if(posFicha_Y < (gameInterface_size_height - gameInterface_size_margin/2)*ficha_size){
-                    clearBlock(posFicha_X, posFicha_Y, ficha_size);
-                    posFicha_Y = posFicha_Y + ficha_size;
-                    drawFicha(posFicha_X, posFicha_Y, 1);
+                if(testCollisionBottom(posX, posY, ficha)){
+                    posY = starting_point_y;
+                    posX = starting_point_x;
+                    ficha = getFicha(posX, posY);
+                    insertFicha(posX, posY, ficha); // ficha
+                }else{
+                    clearFichaSide(posX, posY, 1, ficha);
+                    posY++;
+                    insertFicha(posX, posY, ficha);
                 }
             }else if(tecla == 72){ // Arriba
-                posFicha_Y - posFicha_Y - ficha_size;
-                drawFicha(posFicha_X, posFicha_Y, 1);
+                rotacion_grados_ficha_actual += 90;
+                if(rotacion_grados_ficha_actual == 360){
+                    rotacion_grados_ficha_actual = 0;
+                }
+                clearOnRotate(posX, posY, ficha);
+                insertFicha(posX, posY, ficha);
             }else if(tecla == 75){ // Izquierda
-                if(posFicha_X > gameInterface_size_margin){
-                    clearBlock(posFicha_X, posFicha_Y, ficha_size);
-                    posFicha_X = posFicha_X - ficha_size;
-                    drawFicha(posFicha_X, posFicha_Y, 1);
+                if(!testCollisionLeft(posX, posY, ficha)){
+                    posX--;
+                    insertFicha(posX, posY, ficha);
+                    clearFichaSide(posX, posY, 2, ficha);
                 }
             }else if(tecla == 77){ // Derecha
-                if(posFicha_X < (gameInterface_size_width * ficha_size) - gameInterface_size_margin ){
-                    clearBlock(posFicha_X, posFicha_Y, ficha_size);
-                    posFicha_X = posFicha_X + ficha_size;
-                    drawFicha(posFicha_X, posFicha_Y, 1);
+                if(!testCollisionRight(posX, posY, ficha)){
+                    clearFichaSide(posX, posY, 3, ficha);
+                    posX++;
+                    insertFicha(posX, posY, ficha);
                 }
             }
-        }
+        } // End kbhit
 
-
-
-
-
-    }
-}
-
-void drawGameInterface(int posX, int posY, int size = 1){
-
-    cursorPos(posX, posY);
-
-    int controller_width = 0;
-    for(int i = 0; i < (gameInterface_size_height + gameInterface_size_margin) * size; i++){
-
-        int controller_height = 0;
-        //Vaciamos el tablero
-        for(int j = 0; j < (gameInterface_size_width + gameInterface_size_margin) * size; j++){
-            setColors(0, 14);
-            printf(" ");
-        }
-
-        printf("\n");
-
-        posY++;
-        controller_width++;
-        cursorPos(posX, posY);
-    }
-
-}
-/*
-void insertFicha(int game_zone_table_X, int game_zone_table_Y){
-    //La metemos en el array
-    for(int i = 0; i < 7; i++){
-        for(int j = 0; j < 5; j++){
-            if(game_zone_table[i+game_zone_table_X][j+game_zone_table_Y] == 0){ // Este if puede servir para no chafar fichas
-                game_zone_table[i+game_zone_table_X][j+game_zone_table_Y] = tetrominoe_1[i][j];
+        // Gravedad
+        t_ahora = time(NULL);		// Actualizamos el tiempo
+        if ( t_ahora - t_ultimoTick > 0 ){ // Checkeamos si ha pasado 1 segundo desde la ultima caida de ficha (tick)
+            //Comprobar que no caiga la ficha si hay cosas debajo
+            if(testCollisionBottom(posX, posY, ficha)){
+                posY = starting_point_y;
+                posX = starting_point_x;
+                ficha = getFicha(posX, posY);
+                insertFicha(posX, posY, ficha); // ficha
             }else{
-
+                clearFichaSide(posX, posY, 1, ficha);
+                posY++;
+                insertFicha(posX, posY, ficha);
             }
+            t_ultimoTick = time(NULL);		// Actualizamos el tiempo otra vez
 
         }
+
+     drawGameArea();
     }
 
-    currentFicha_X = game_zone_table_X;
-    currentFicha_Y = game_zone_table_Y;
-}
-*/
-
-void clearBlock(int posX, int posY, int size){
-
-    int localX = posX + gameInterface_position_X + gameInterface_size_margin;
-    int localY = posY + gameInterface_position_Y + gameInterface_size_margin;
-
-    cursorPos(localX, localY);
-    //printf("%d %d", posX, posY);
-    for(int i = posY-1; i < posY+7; i++){
-        for(int j = posX-1; j < posX+5; j++){
-            printf(" ");
-        }
-        printf("\n");
-        localY++;
-        cursorPos(localX, localY);
-    }
+    game_finished();
 
 }
 
-void drawFicha(int posX, int posY, int tipoFicha){
-    // Pasamos coordenadas globales a locales
-    int localX = posX + gameInterface_position_X + gameInterface_size_margin;
-    int localY = posY + gameInterface_position_Y + gameInterface_size_margin;
-
-
-    setColors(0, 14);
-    cursorPos(localX, localY);
-
+bool testCollisionLeft(int posX, int posY, int tipoFicha){
     switch (tipoFicha){
         case 1:
-            // START L
-            for(int i = 0; i < 7; i++){
-                for(int j = 0; j < 5; j++){
-                    if(tetrominoe_1[i][j] == 1){
-                        printf("%c", gameFicha_ascii_model);
-                    }
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
                 }
-                printf("\n");
-                localY++;
-                cursorPos(localX, localY);
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX - 1] != 0){
+                    return true;
+                }
             }
-            // END L
         break;
         case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0 || game_area[posY + 3][posX - 1] != 0){
+                    return true;
+                }
+            }else{
+                if(game_area[posY][posX - 1]){
+                    return true;
+                }
+            }
+        break;
+        case 3:
+            if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0){
+                return true;
+            }
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX] != 0 || game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1]){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX + 1] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 7:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX] != 0 || game_area[posY + 1][posX - 1] != 0 ){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 1][posX - 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX - 1] != 0 || game_area[posY + 1][posX] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX] != 0 || game_area[posY + 1][posX - 1] != 0 || game_area[posY + 2][posX] != 0){
+                    return true;
+                }
+            }
+        break;
+    }
+}
 
+bool testCollisionRight(int posX, int posY, int tipoFicha){
+    switch (tipoFicha){
+
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX + 1] != 0 + game_area[posY + 1][posX + 1] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY][posX + 3] != 0 || game_area[posY + 1][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 2] != 0 || game_area[posY + 3][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX + 3] != 0 || game_area[posY + 1][posX + 3] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 1] != 0 || game_area[posY + 1][posX + 1] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }else{
+                if(game_area[posY][posX + 4]){
+                    return true;
+                }
+            }
         break;
 
+        case 3:
+            if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 2] != 0){
+                return true;
+            }
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 2] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY + 1][posX + 3] != 0 || game_area[posY][posX + 1]){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 1] != 0 || game_area[posY + 2][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX + 3] != 0 || game_area[posY + 1][posX + 3] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 1] != 0 || game_area[posY + 1][posX + 2] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 3] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 2] != 0 || game_area[posY + 2][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 3] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 7:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 3] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY + 1][posX + 2] != 0 || game_area[posY][posX + 1] != 0 || game_area[posY + 2][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY][posX + 3] != 0 || game_area[posY + 1][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY][posX + 2] != 0 || game_area[posY + 1][posX + 2] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }
+        break;
     }
+}
+
+bool testCollisionBottom(int posX, int posY, int tipoFicha){
+    switch (tipoFicha){
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 3][posX + 1] != 0 ){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 1][posX + 1] != 0  || game_area[posY + 1][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 4][posX] != 0){
+                    return true;
+                }
+            }else{
+                if(game_area[posY + 1][posX] || game_area[posY + 1][posX + 1] || game_area[posY + 1][posX + 2] || game_area[posY + 1][posX + 3]){
+                    return true;
+                }
+            }
+        break;
+        case 3:
+            if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0){
+                return true;
+            }
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 1][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 1][posX + 1] != 0 || game_area[posY + 2][posX + 2]){
+                    return true;
+                }
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2]){
+                    return true;
+                }
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 2][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2]){
+                    return true;
+                }
+            }
+        break;
+        case 7:
+            if(rotacion_grados_ficha_actual == 0){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 2][posX + 2] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(game_area[posY + 3][posX] != 0 || game_area[posY + 2][posX + 1] != 0){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(game_area[posY + 1][posX] != 0 || game_area[posY + 2][posX + 1] != 0 || game_area[posY + 1][posX + 2]){
+                    return true;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(game_area[posY + 2][posX] != 0 || game_area[posY + 3][posX + 1] != 0){
+                    return true;
+                }
+            }
+        break;
+    }
+
+}
+
+void clearOnRotate(int posX, int posY, int tipoFicha){
+
+    switch(tipoFicha){
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 1]       = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY + 2][posX]           = 0;
+                game_area[posY + 2][posX + 1]       = 0;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY + 1][posX]           = 0;
+                game_area[posY][posX + 2]           = 0;
+            }else if(rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX]               = 0;
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 2][posX + 1]       = 0;
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]               = 0;
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY][posX + 3]           = 0;
+            }else{
+                game_area[posY][posX]               = 0;
+                game_area[posY + 1][posX]           = 0;
+                game_area[posY + 2][posX]           = 0;
+                game_area[posY + 3][posX]           = 0;
+            }
+        break;
+        case 3:
+           // Esta ficha no rota! :D
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY][posX]               = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY + 2][posX]           = 0;
+                game_area[posY + 2][posX + 1]       = 0;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY + 1][posX + 1]       = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else if (rotacion_grados_ficha_actual == 270){
+                game_area[posY + 1][posX]           = 0;
+                game_area[posY + 2][posX]           = 0;
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else{
+                game_area[posY + 2][posX + 1]       = 0;
+                game_area[posY + 1][posX]           = 0;
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]               = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else{
+                game_area[posY + 2][posX]           = 0;
+                game_area[posY + 1][posX]           = 0;
+            }
+        break;
+        case 7:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY + 2][posX + 1]       = 0;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY][posX + 1]           = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY + 1][posX]           = 0;
+                game_area[posY + 2][posX]           = 0;
+            }else if (rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX ]              = 0;
+                game_area[posY][posX + 2]           = 0;
+            }
+        break;
+    }
+
+}
+
+void drawGameArea(){
+   int step = 0;
+   for(int j = 0; j < gameInterface_size_height + (gameInterface_margin + 1); j++){
+        cursorPos(starting_point_x - gameInterface_margin, starting_point_y + step);
+        for(int i = 0; i < gameInterface_size_width + gameInterface_margin; i++){
+            if(game_area[j][i] == 9 || game_area[j][i] == 8){
+                //Margins (FC)
+                setColors(3, 15);
+                printf(" ", game_area[j][i]);
+            }else if(game_area[j][i] == 1){ // Ficha 1 -> L
+                setColors(8, 13);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 2){ // Ficha 2 -> I
+                setColors(8, 12);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 3){ // Ficha 3 -> Cuadrado
+                setColors(8, 14);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 4){
+                setColors(8, 11);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 5){
+                setColors(8, 10);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 6){
+                setColors(8, 9);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 7){
+                setColors(12, 6);
+                printf("%c", gameFicha_ascii_model);
+            }else if(game_area[j][i] == 99){
+                setColors(12, 14);
+                printf("%d", game_area[j][i]);
+            }else if(game_area[j][i] == 0){ // Vacio
+                setColors(1, 15);
+                printf(" ", game_area[j][i]);
+            }
+
+        }
+       step++;
+    }
+    resetColors();
+}
+
+void clearFichaSide(int posX, int posY, int side, int tipoFicha){
+    cursorPos(posX, posY-1);
+    switch (tipoFicha){
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 2][posX + 1]   = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                    game_area[posY + 2][posX + 2]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 2][posX]       = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY][posX + 2]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 3]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX]       = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY + 1][posX + 2]   = 0;
+                    game_area[posY + 2][posX + 2]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                    game_area[posY + 2][posX + 1]   = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(side == 1){ // Top
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                    game_area[posY][posX + 2]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 3]       = 0;
+                    game_area[posY + 1][posX + 3]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY + 1][posX]       = 0;
+                }
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                    game_area[posY + 2][posX + 1]   = 0;
+                    game_area[posY + 3][posX + 1]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 2][posX]       = 0;
+                    game_area[posY + 3][posX]       = 0;
+                }
+            }else{
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY][posX + 3]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 4]       = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                }
+            }
+        break;
+        case 3:
+            if(side == 1){ // Top
+                game_area[posY][posX]               = 0;
+                game_area[posY][posX + 1]           = 0;
+            }else if(side == 2){ // Right
+                game_area[posY][posX + 2]           = 0;
+                game_area[posY + 1][posX + 2]       = 0;
+            }else if(side == 3){ //Left
+                game_area[posY][posX]               = 0;
+                game_area[posY + 1][posX]           = 0;
+            }
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                if(side == 1){ // Top
+                    game_area[posY][posX + 1]           = 0;
+                    game_area[posY + 2][posX]           = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]           = 0;
+                    game_area[posY + 1][posX + 2]       = 0;
+                    game_area[posY + 2][posX + 2]       = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX + 1]           = 0;
+                    game_area[posY + 1][posX + 1]       = 0;
+                    game_area[posY + 2][posX]           = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(side == 1){ // Top
+                    game_area[posY][posX]              = 0;
+                    game_area[posY + 1][posX + 1]      = 0;
+                    game_area[posY + 1][posX + 2]      = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 1]          = 0;
+                    game_area[posY + 1][posX + 3]      = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]              = 0;
+                    game_area[posY + 1][posX]          = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY][posX]              = 0;
+                    game_area[posY][posX + 1]          = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]          = 0;
+                    game_area[posY + 1][posX + 1]      = 0;
+                    game_area[posY + 2][posX + 1]      = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]              = 0;
+                    game_area[posY + 1][posX]          = 0;
+                    game_area[posY + 2][posX]          = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(side == 1){ // Top
+                    game_area[posY][posX]             = 0;
+                    game_area[posY][posX + 1]         = 0;
+                    game_area[posY][posX + 2]         = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 3]         = 0;
+                    game_area[posY + 1][posX + 3]     = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]             = 0;
+                    game_area[posY + 1][posX + 2]     = 0;
+                }
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 2]   = 0;
+                    game_area[posY + 2][posX + 2]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 2][posX + 1]   = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 2]   = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY + 1][posX + 3]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                }
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY][posX + 1]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY + 1][posX + 2]   = 0;
+                    game_area[posY + 2][posX + 1]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX]       = 0;
+                    game_area[posY + 2][posX]       = 0;
+         game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX + 1]   = 0;       }
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                if(side == 1){ // Top
+                    game_area[posY][posX]           = 0;
+                    game_area[posY][posX + 1]       = 0;
+                    game_area[posY + 1][posX + 2]   = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]       = 0;
+                    game_area[posY + 1][posX + 3]   = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]           = 0;
+                    game_area[posY + 1][posX + 1]   = 0;
+                }
+            }
+        break;
+        case 7:
+            if(rotacion_grados_ficha_actual == 0){
+                if(side == 1){ // Top
+                    game_area[posY][posX + 1]           = 0;
+                    game_area[posY + 1][posX]           = 0;
+                    game_area[posY + 1][posX + 2]       = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]           = 0;
+                    game_area[posY + 1][posX + 3]       = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX + 1]           = 0;
+                    game_area[posY + 1][posX]           = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 90){
+                if(side == 1){ // Top
+                    game_area[posY][posX]              = 0;
+                    game_area[posY + 1][posX + 1]      = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 1]          = 0;
+                    game_area[posY + 1][posX + 2]      = 0;
+                    game_area[posY + 2][posX + 1]      = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]              = 0;
+                    game_area[posY + 1][posX]          = 0;
+                    game_area[posY + 2][posX]          = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 180){
+                if(side == 1){ // Top
+                    game_area[posY][posX]              = 0;
+                    game_area[posY][posX + 1]          = 0;
+                    game_area[posY][posX + 2]          = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 3]          = 0;
+                    game_area[posY + 1][posX + 2]      = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX]              = 0;
+                    game_area[posY + 1][posX + 1]      = 0;
+                }
+            }else if(rotacion_grados_ficha_actual == 270){
+                if(side == 1){ // Top
+                    game_area[posY + 1][posX]         = 0;
+                    game_area[posY][posX + 1]         = 0;
+                }else if(side == 2){ // Right
+                    game_area[posY][posX + 2]         = 0;
+                    game_area[posY + 1][posX + 2]     = 0;
+                    game_area[posY + 2][posX + 2]     = 0;
+                }else if(side == 3){ //Left
+                    game_area[posY][posX + 1]         = 0;
+                    game_area[posY + 1][posX]         = 0;
+                    game_area[posY + 2][posX + 1]     = 0;
+                }
+            }
+        break;
+    }
+}
+
+void checkLines(){
+
+    int lineaCompleta;
+
+    int x_pos;
+	int y_pos;
+	int current_y_pos;
+	int lineasEliminadas = 0;
+	int must_update_points = 0;
+
+    // Checkeamos todas las lineas, desde abajo hacia arriba, de izquierda a derecha
+    // Si hay lineas completas, hacemos puntuacion
+    for(int y_pos = gameInterface_size_height + 1; y_pos > 1; y_pos--){
+
+        lineaCompleta = 1;
+        for(int x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
+
+            //Comprobamos si en esta linea hay algun "hueco"
+            if(game_area[y_pos][x_pos] == 0){
+                lineaCompleta = 0;
+            }
+
+        }
+
+        if(lineaCompleta){
+
+            // Eliminamos la linea
+            for(int x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
+                game_area[y_pos][x_pos] = 0;
+            }
+
+            // Tiramos lineas hacia abajo
+            for(current_y_pos = y_pos; current_y_pos > 2; current_y_pos--){
+
+                for(x_pos = 1; x_pos <= gameInterface_size_width; x_pos++){
+                    game_area[current_y_pos][x_pos] = game_area[current_y_pos - 1][x_pos];
+                }
+
+            }
+
+            must_update_points = 1;
+            lineasEliminadas += 1;
+            y_pos++;
+
+        } // Linea completa
+
+
+    }// Check lines bucle
+
+    // Actualizamos los puntos
+    if(lineasEliminadas < 4){
+        PUNTOS += lineasEliminadas * PUNTOS_LINEA;
+
+    }else{
+        PUNTOS += PUNTOS_TETRIS;
+    }
+
+    if(must_update_points){
+        updatePoints();
+        must_update_points = 0;
+    }
+
+
 
 
 
 }
 
+void updatePoints(){
 
+    for(int y = 2; y < 8; y++){
+        for(int x = 10; x <= 20; x++){
+            cursorPos(gameInterface_size_width + x, y);
+            printf(" ");
+        }
+    }
+    cursorPos(gameInterface_size_width + 10, 2);
+    printf("---SCORE---");
+
+    cursorPos(gameInterface_size_width + 15, 3);
+    printf("%d", PUNTOS);
+}
+
+void drawCredits(){
+
+    for(int y = 10; y < 13; y++){
+        for(int x = 10; x <= 20; x++){
+            cursorPos(gameInterface_size_width + x, y);
+            printf(" ");
+        }
+    }
+    cursorPos(gameInterface_size_width + 10, 10);
+    printf("---COINS---");
+
+    cursorPos(gameInterface_size_width + 14, 12);
+    printf("%d", CREDITOS);
+
+}
+
+void drawCurrentUser(){
+    cursorPos(3, gameInterface_size_height + 6);
+    printf("User: %s", CURRENT_USER);
+}
+
+void checkGameLost(int posX, int posY){
+    if(game_area[posY + 4][posX - 4] != 0 || game_area[posY + 4][posX - 3] != 0 ||  game_area[posY + 4][posX - 2] != 0 || game_area[posY + 4][posX - 1] != 0 || game_area[posY + 4][posX] != 0 || game_area[posY + 4][posX + 1] != 0 || game_area[posY + 4][posX + 2] || game_area[posY + 4][posX + 3] || game_area[posY + 4][posX + 4] != 0 || game_area[posY + 4][posX + 5] != 0){
+        CREDITOS--;
+        game_alive = 0;
+    }
+}
+
+void drawHighScores(){
+
+    FILE *fichero_datos;
+
+    int x = 50;
+    int y = 2;
+
+    cursorPos(x, y);
+    setColors(0, 9);
+    printf("High Scores\n");
+
+    y = y + 2;
+    cursorPos(x - 3, y);
+    printf("User       Score \n \n");
+    fichero_datos = fopen("../database/players_database.dat", "rb");
+
+    y = y + 1;
+
+    setColors(0, 3);
+    while(!feof(fichero_datos)){
+    fread(&jugador, sizeof(jugador), 1, fichero_datos);
+    if(!feof(fichero_datos)){
+        y++;
+        cursorPos(x - 3,y);
+        printf("%s        %d \n \n",
+           jugador.usuario,
+           jugador.high_score);
+        }
+
+    }
+    fclose(fichero_datos);
+
+}
+
+void insertFicha(int posX, int posY, int tipoFicha){
+    switch (tipoFicha){
+        case 1:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY][posX]           = 1;
+                game_area[posY + 1][posX]       = 1;
+                game_area[posY + 2][posX]       = 1;
+                game_area[posY + 2][posX + 1]   = 1;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY][posX]           = 1;
+                game_area[posY][posX + 1]       = 1;
+                game_area[posY][posX + 2]       = 1;
+                game_area[posY + 1][posX]       = 1;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]           = 1;
+                game_area[posY][posX + 1]       = 1;
+                game_area[posY + 1][posX + 1]   = 1;
+                game_area[posY + 2][posX + 1]   = 1;
+            }else if(rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX + 2]       = 1;
+                game_area[posY + 1][posX]       = 1;
+                game_area[posY + 1][posX + 1]   = 1;
+                game_area[posY + 1][posX + 2]   = 1;
+            }
+        break;
+        case 2:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]       = 2;
+                game_area[posY + 1][posX]   = 2;
+                game_area[posY + 2][posX]   = 2;
+                game_area[posY + 3][posX]   = 2;
+            }else{
+                game_area[posY][posX]       = 2;
+                game_area[posY][posX + 1]   = 2;
+                game_area[posY][posX + 2]   = 2;
+                game_area[posY][posX + 3]   = 2;
+            }
+        break;
+        case 3:
+            game_area[posY][posX]               = 3;
+            game_area[posY][posX + 1]           = 3;
+            game_area[posY + 1][posX]           = 3;
+            game_area[posY + 1][posX + 1]       = 3;
+        break;
+        case 4:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY][posX + 1]       = 4;
+                game_area[posY + 1][posX + 1]   = 4;
+                game_area[posY + 2][posX + 1]   = 4;
+                game_area[posY + 2][posX]       = 4;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY][posX]           = 4;
+                game_area[posY + 1][posX]       = 4;
+                game_area[posY + 1][posX + 1]   = 4;
+                game_area[posY + 1][posX + 2]   = 4;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]           = 4;
+                game_area[posY][posX + 1]       = 4;
+                game_area[posY + 1][posX]       = 4;
+                game_area[posY + 2][posX]       = 4;
+            }else if(rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX]           = 4;
+                game_area[posY][posX + 1]       = 4;
+                game_area[posY][posX + 2]       = 4;
+                game_area[posY + 1][posX + 2]   = 4;
+            }
+        break;
+        case 5:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]               = 5;
+                game_area[posY + 1][posX]           = 5;
+                game_area[posY + 1][posX + 1]       = 5;
+                game_area[posY + 2][posX + 1]       = 5;
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX]               = 5;
+                game_area[posY][posX + 1]           = 5;
+                game_area[posY + 1][posX + 1]       = 5;
+                game_area[posY + 1][posX + 2]       = 5;
+            }
+        break;
+        case 6:
+            if(rotacion_grados_ficha_actual == 0 || rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX + 1]           = 6;
+                game_area[posY + 1][posX + 1]       = 6;
+                game_area[posY + 1][posX]           = 6;
+                game_area[posY + 2][posX]           = 6;
+            }else if(rotacion_grados_ficha_actual == 90 || rotacion_grados_ficha_actual == 270){
+
+                game_area[posY][posX]               = 6;
+                game_area[posY][posX + 1]           = 6;
+                game_area[posY + 1][posX + 1]       = 6;
+                game_area[posY + 1][posX + 2]       = 6;
+            }
+        break;
+        case 7:
+            if(rotacion_grados_ficha_actual == 0){
+                game_area[posY][posX + 1]       = 7;
+                game_area[posY + 1][posX]       = 7;
+                game_area[posY + 1][posX + 1]   = 7;
+                game_area[posY + 1][posX + 2]   = 7;
+            }else if(rotacion_grados_ficha_actual == 90){
+                game_area[posY][posX]           = 7;
+                game_area[posY + 1][posX]       = 7;
+                game_area[posY + 1][posX + 1]   = 7;
+                game_area[posY + 2][posX]       = 7;
+            }else if(rotacion_grados_ficha_actual == 180){
+                game_area[posY][posX]           = 7;
+                game_area[posY][posX + 1]       = 7;
+                game_area[posY][posX + 2]       = 7;
+                game_area[posY + 1][posX + 1]   = 7;
+            }else if(rotacion_grados_ficha_actual == 270){
+                game_area[posY][posX + 1]       = 7;
+                game_area[posY + 1][posX]       = 7;
+                game_area[posY + 1][posX + 1]   = 7;
+                game_area[posY + 2][posX + 1]   = 7;
+            }
+        break;
+    }
+
+}
 
 void setColors(int texto, int fondo){
     colorTexto(texto, fondo);
 }
 
-void menu(){
-    //ventana(0, 0, 4, 3, 0);
-
+void resetColors(){
+    setColors(1, 15);
 }
 
+bool login_access(){
 
+    FILE *fichero_datos;
+
+    char usuario[20];
+    char pass[20];
+    bool keep_searching = true;
+    bool lets_play = false;
+
+    system("cls");
+    printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
+    printf("Nombre de Usuario: ");
+    scanf("%s", &usuario);
+    fflush(stdin);
+
+    printf("Password: ");
+    scanf("%s", &pass);
+    fflush(stdin);
+    printf("\n");
+
+    fichero_datos = fopen("../database/players_database.dat", "rb");
+
+    while(!feof(fichero_datos) || keep_searching){
+
+    fread(&jugador, sizeof(jugador), 1, fichero_datos);
+
+        if(!feof(fichero_datos) || keep_searching){
+            if(strcmp(strupr(jugador.usuario), strupr(usuario)) == 0 && strcmp(strupr(jugador.pass), strupr(pass)) == 0 ){
+                printf("Login Correcto\n\n");
+                printf("Pulsa cualquier tecla para iniciar partida");
+                getch();
+                strcpy(CURRENT_USER, jugador.usuario);
+                CREDITOS = jugador.fichas;
+                keep_searching = false;
+                lets_play = true;
+            }
+        }
+    }
+    fclose(fichero_datos);
+    if(lets_play){
+        return true;
+    }
+}
+
+bool login(){
+    int elec;
+
+    do{
+        system("cls");
+        printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
+        printf("1.- Jugar\n");
+        //printf("2.- Maximas puntuaciones\n\n\n");
+        printf("3.- Salir \n\n");
+
+        scanf("%d", &elec);
+
+
+        switch(elec){
+            case 1:
+                while(login_access()){
+                    return true;
+                }
+            break;
+            case 2:
+
+            break;
+
+            case 3:
+                return false;
+        }
+
+    }while(elec != 3);
+}
+
+void game_finished(){
+
+    FILE *fichero_datos;
+    bool keep_searching = true;
+
+    system("cls");
+    printf("*** ------------ *** iJosTris *** ------------ ***\n");
+    printf("*** --------- /\\Partida Finalizada/\\ --------- ***\n");
+    printf("*** ------------------------------------------ ***\n\n\n");
+
+    printf("Guardando PUNTUACION (%d) Y CREDITOS (%d) PARA EL JUGADOR %s \n", PUNTOS, CREDITOS, CURRENT_USER);
+
+/*
+    fichero_datos = fopen("../database/players_database.dat", "r+");
+    int apuntador = 0;
+
+    while(!feof(fichero_datos)){
+
+    fread(&jugador, sizeof(jugador), 1, fichero_datos);
+
+        if(!feof(fichero_datos) || keep_searching){
+            if(strcmp(strupr(jugador.usuario), strupr(CURRENT_USER)) == 0){
+                fseek(fichero_datos, sizeof(jugador) * apuntador, SEEK_SET);
+                jugador.fichas = CREDITOS;
+                jugador.high_score = PUNTOS;
+                fwrite(&jugador, sizeof(jugador), 1, fichero_datos);
+                keep_searching = false;
+                //printf("Guardado con EXITO");
+            }
+            apuntador++
+        }
+
+    }
+    fclose(fichero_datos);
+*/
+    exit(1);
+}
 
 int main(){
-    /* Para la correcta ejecución de este juego, debemos poner la consola en "fuente de mapa de bits" y 8x8 píxeles de tamaño */
-    //Nuestra ventana molona bien grande
-    ventanaConsola(anchoVentana, altoVentana, "iJosTris");
-
     //Establecemos los colores iniciales
-    setColors(0, 14);
-
-    pantallaJuego();
-    /*
-    for(int i = 1; i < 255; i++){
-        printf("%d -> %c \n", i, i);
+    system("color 08");
+    if(login()){
+        game_init();
+        drawGameArea();
+        updatePoints();
+        drawCredits();
+        drawCurrentUser();
+        drawHighScores();
+        gameLoop();
     }
-    */
 
-
-
-    //menu();
-
-    getch();
     return 0;
 }
-
-
-
