@@ -1189,7 +1189,13 @@ bool login_access(){
     bool lets_play = false;
 
     system("cls");
-    printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
+    printf("                                                                          \n");
+    printf("                                                                          \n");
+    printf("*** ------------------------ *** iJosTris *** ------------------------ ***\n");
+    printf("                                                                          \n");
+    printf("                                                                          \n");
+    printf("                                                                          \n");
+    printf("                                                                          \n");
     printf("Nombre de Usuario: ");
     scanf("%s", &usuario);
     fflush(stdin);
@@ -1228,11 +1234,49 @@ bool login(){
 
     do{
         system("cls");
-        printf("*** ------------ *** iJosTris *** ------------ ***\n\n\n");
-        printf("1.- Jugar\n");
+        printf("                                                                          \n");
+        printf("                                                                          \n");
+        printf("*** ------------------------ *** iJosTris *** ------------------------ ***\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                            1.- Jugar                                   *\n");
         //printf("2.- Maximas puntuaciones\n\n\n");
-        printf("3.- Salir \n\n");
-
+        printf("*                                                                        *\n");
+        printf("*                            3.- Salir                                   *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("* Junio 2014                                            by @iJos         *\n");
+        printf("*                                                                        *\n");
+        printf("* ESAT - Videogames Programming                                          *\n");
+        printf("*                                                                        *\n");
+        printf("*                                                                        *\n");
+        printf("*** ------------------------------------------------------------------ ***\n");
         scanf("%d", &elec);
 
 
